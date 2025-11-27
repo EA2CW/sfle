@@ -6,7 +6,11 @@ body {
   display: flex;
   flex-direction: column;;
   min-height: 100%;
-    background: lightgray;
+  background: #d3d3d3;
+}
+
+[data-bs-theme="dark"] body {
+  background: #212529;
 }
 
 .footer {
@@ -33,7 +37,11 @@ body {
 
 .qsoList {
   height: 440px;
-    background: white;
+  background: white;
+}
+
+[data-bs-theme="dark"] .qsoList {
+  background: #1a1d20;
 }
 
 table {
@@ -53,11 +61,33 @@ tbody {
   position: absolute;
 }
 thead tr {
-    background-color: darkgray;
+  background-color: #a9a9a9;
+  color: #000;
+}
+
+[data-bs-theme="dark"] thead tr {
+  background-color: #495057;
+  color: #fff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #fff;
 }
 
 [data-bs-theme="dark"] tbody tr:nth-child(even) {
   background-color: #2a2a2a;
+}
+
+[data-bs-theme="dark"] tbody tr:nth-child(odd) {
+  background-color: #1a1d20;
+}
+
+[data-bs-theme="dark"] tbody tr {
+  color: #dee2e6;
 }
 @media (min-width: 1200px) {
   .input-example {

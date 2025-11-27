@@ -76,10 +76,62 @@ var callsign = "";
 var errors = [];
 var qsoList = [];
 
+function parseDateInput(dateStr) {
+    if (!dateStr || dateStr.trim() === '') {
+        return null;
+    }
+
+    dateStr = dateStr.trim();
+
+    // Try ISO format first (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+    }
+
+    // Parse DD/MM/YYYY or DD-MM-YYYY
+    let match = dateStr.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+    if (match) {
+        const day = match[1].padStart(2, '0');
+        const month = match[2].padStart(2, '0');
+        const year = match[3];
+
+        // Determine if it's DD/MM/YYYY or MM/DD/YYYY based on locale
+        const locale = navigator.language || navigator.userLanguage || 'en-US';
+
+        // If UK/EU locale or day is > 12, assume DD/MM/YYYY
+        if (locale.startsWith('en-GB') || locale.startsWith('en-AU') ||
+            locale.startsWith('en-NZ') || locale.startsWith('en-IE') ||
+            parseInt(match[1]) > 12) {
+            // DD/MM/YYYY format
+            return `${year}-${month}-${day}`;
+        } else {
+            // MM/DD/YYYY format (US)
+            return `${year}-${day}-${month}`;
+        }
+    }
+
+    // Try to parse as a Date object as fallback
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+    }
+
+    return null;
+}
+
 function handleInput() {
     var qsodate = "";
-    if ($("#qsodate").val()) {
-        qsodate = new Date($("#qsodate").val()).toISOString().split("T")[0];
+    var dateInput = $("#qsodate").val();
+
+    if (dateInput) {
+        var parsedDate = parseDateInput(dateInput);
+        if (parsedDate) {
+            qsodate = parsedDate;
+            // Update the input field with ISO format for consistency
+            $("#qsodate").attr('data-iso-date', qsodate);
+        } else {
+            qsodate = new Date().toISOString().split("T")[0];
+        }
     } else {
         qsodate = new Date().toISOString().split("T")[0];
     }
@@ -545,8 +597,14 @@ $(".js-download-fle").click(function () {
     var mySigInfo = $("#my-sig-ref").val().toUpperCase();
     var qsodate = "";
 
-    if ($("#qsodate").val()) {
-        qsodate = new Date($("#qsodate").val()).toISOString().split("T")[0];
+    var dateInput = $("#qsodate").val();
+    if (dateInput) {
+        var parsedDate = parseDateInput(dateInput);
+        if (parsedDate) {
+            qsodate = parsedDate;
+        } else {
+            qsodate = new Date().toISOString().split("T")[0];
+        }
     } else {
         qsodate = new Date().toISOString().split("T")[0];
     }
@@ -766,4 +824,55 @@ $(document).ready(function () {
 
     loadPowerSettings();
     loadMyGridSettings();
+
+    // Set date format hint based on locale
+    setDateFormatHint();
 });
+
+function setDateFormatHint() {
+    // Get user's locale
+    const locale = navigator.language || navigator.userLanguage || 'en-US';
+
+    // Create a sample date to determine format
+    const sampleDate = new Date(2025, 2, 9); // March 9, 2025
+
+    // Format the date according to locale
+    const formatter = new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+
+    const formattedDate = formatter.format(sampleDate);
+
+    // Determine the format pattern from the formatted date
+    let formatPattern = '';
+
+    // Common patterns based on formatted output
+    if (formattedDate.includes('/')) {
+        // US format: MM/DD/YYYY or others
+        const parts = formattedDate.split('/');
+        if (parts[0] === '03') {
+            formatPattern = 'dd/mm/yyyy';
+        } else if (parts[0] === '09') {
+            formatPattern = 'dd/mm/yyyy';
+        } else {
+            formatPattern = 'mm/dd/yyyy';
+        }
+    } else if (formattedDate.includes('-')) {
+        formatPattern = 'yyyy-mm-dd';
+    } else if (formattedDate.includes('.')) {
+        formatPattern = 'dd.mm.yyyy';
+    } else {
+        formatPattern = 'yyyy-mm-dd';
+    }
+
+    // Display the hint
+    $('.js-date-format-hint').text('e.g. ' + formatPattern);
+
+    // Set placeholder on the input field
+    $('#qsodate').attr('placeholder', formatPattern);
+
+    // Set title attribute for additional help
+    $('#qsodate').attr('title', 'Enter date in ' + formatPattern + ' format');
+}
