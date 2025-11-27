@@ -6,6 +6,7 @@ body {
   display: flex;
   flex-direction: column;;
   min-height: 100%;
+    background: lightgray;
 }
 
 .footer {
@@ -32,6 +33,7 @@ body {
 
 .qsoList {
   height: 440px;
+    background: white;
 }
 
 table {
@@ -50,7 +52,13 @@ tbody {
   max-height: 380px;
   position: absolute;
 }
+thead tr {
+    background-color: darkgray;
+}
 
+[data-bs-theme="dark"] tbody tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
 @media (min-width: 1200px) {
   .input-example {
     font-size: x-small;
@@ -59,3 +67,9 @@ tbody {
     font-size: small;
   }
 }
+
+li.nav-item {
+    margin-right: 10px;
+}
+
+

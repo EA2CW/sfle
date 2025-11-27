@@ -102,14 +102,35 @@
 									<input type="date" class="form-control" id="qsodate">
 								</div>
 							</div>
-							<div class="col-xs-12 col-lg-12 col-xl-6">
-								<div class="form-group">
-									<label for="wwff">WWFF/SOTA <span class="text-muted input-example">e.g.
-											OKFF-2068</span></label>
-									<input type="text" class="form-control text-uppercase" id="my-sota-wwff" autofocus>
-								</div>
-							</div>
 						</div>
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-6">
+                                <div class="form-group">
+                                    <label for="my-sig">SIG <span class="text-muted input-example">e.g.
+											SOTA</span></label>
+                                    <input type="text" class="form-control text-uppercase" id="my-sig" list="sig-list" placeholder="Select or type SIG..." autofocus>
+                                    <datalist id="sig-list">
+                                        <option value="SOTA">
+                                        <option value="WWFF">
+                                        <option value="POTA">
+                                        <option value="WOTA">
+                                        <option value="HEMA">
+                                        <option value="LOTA">
+                                        <option value="ROTA">
+                                        <option value="IOTA">
+                                        <option value="GMA">
+                                        <option value="BOTA">
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-lg-6">
+                                <div class="form-group">
+                                    <label for="my-sig-ref">Ref <span class="text-muted input-example">e.g.
+											OKFF-2068</span></label>
+                                    <input type="text" class="form-control text-uppercase" id="my-sig-ref" autofocus>
+                                </div>
+                            </div>
+                        </div>
 						<div class="row">
 							<div class="col-xs-12 col-lg-6">
 								<div class="form-group">
@@ -150,7 +171,8 @@
 										<th>RS</th>
 										<th>RR</th>
 										<th>Op.</th>
-										<th>SOTA/WFF</th>
+                                        <th>Sig</th>
+                                        <th>Sig Info</th>
 									</tr>
 								</thead>
 								<tbody id="qsoTableBody">
@@ -159,18 +181,21 @@
 							</table>
 						</div>
 						<span class="js-qso-count"></span>
-						<div class="row mt-2">
-							<div class="col-3 col-sm-3">
-								<button class="btn btn-primary js-reload-qso">Reload QSO list</button>
+						<div class="row mt-2 g-2">
+							<div class="col-12 col-sm-6 col-md-4 col-lg">
+								<button class="btn btn-primary js-reload-qso w-100">Reload QSO list</button>
 							</div>
-							<div class="col-3 col-sm-3">
-								<button class="btn btn-warning js-download-adif">Download ADIF</button>
+							<div class="col-12 col-sm-6 col-md-4 col-lg">
+								<button class="btn btn-warning js-download-adif w-100">Download ADIF</button>
 							</div>
-							<div class="col-3 col-sm-3">
-								<button class="btn btn-danger js-empty-qso">Clear logging session</button>
+							<div class="col-12 col-sm-6 col-md-4 col-lg">
+								<button class="btn btn-warning js-download-fle w-100">Download FLE</button>
 							</div>
-							<div class="col-3 col-sm-3">
-								<button class="btn btn-secondary js-load-sample-log">Load sample log</button>
+							<div class="col-12 col-sm-6 col-md-4 col-lg">
+								<button class="btn btn-danger js-empty-qso w-100">Clear logging session</button>
+							</div>
+							<div class="col-12 col-sm-6 col-md-4 col-lg">
+								<button class="btn btn-secondary js-load-sample-log w-100">Load sample log</button>
 							</div>
 						</div>
 					</div>
