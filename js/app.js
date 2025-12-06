@@ -157,6 +157,16 @@ function handleInput() {
     lines.forEach((row) => {
         var rst_s = null;
         var rst_r = null;
+        var comment = "";
+
+        // Extract comment from angle brackets
+        var commentMatch = row.match(/<([^>]+)>/);
+        if (commentMatch) {
+            comment = commentMatch[1].trim();
+            // Remove the comment from the row for further processing
+            row = row.replace(/<[^>]+>/, '').trim();
+        }
+
         items = row.split(" ");
         var itemNumber = 0;
         items.forEach((item) => {
@@ -245,19 +255,33 @@ function handleInput() {
                 rst_r,
                 sigInfo,
                 gridLocator,
+                comment,
             ]);
             // console.log(row);
+
+            // Build callsign cell with optional grid locator underneath
+            let callsignCell = `<div class="cell-primary">${callsign}</div>`;
+            if (gridLocator) {
+                callsignCell += `<div class="cell-meta">${gridLocator}</div>`;
+            }
+
+            // Build sigInfo cell with optional sig underneath
+            let sigInfoCell = sigInfo ? `<div class="cell-primary">${sigInfo}</div>` : '';
+            if (sig && sigInfo) {
+                sigInfoCell += `<div class="cell-meta">${sig}</div>`;
+            }
+
             const tableRow = $(`<tr>
         <td>${extraQsoDate}</td>
         <td>${qsotime}</td>
-        <td>${callsign}</td>
+        <td class="cell-stacked">${callsignCell}</td>
         <td><span data-toggle="tooltip" data-placement="left" title="${freq}">${band}</span></td>
         <td>${mode}</td>
         <td>${rst_s}</td>
         <td>${rst_r}</td>
         <td>${operator}</td>
-        <td>${sig}</td>
-        <td>${sigInfo}</td>
+        <td class="cell-stacked">${sigInfoCell}</td>
+        <td class="comment-cell">${comment}</td>
       </tr>`);
 
             $("#qsoTable > tbody:last-child").append(tableRow);
@@ -583,18 +607,23 @@ Internet: https://sfle.ok2cqr.com
             qso = qso + getAdifTag("GRIDSQUARE", gridLocator);
         }
 
+        let comment = item[10];
+        if (comment) {
+            qso = qso + getAdifTag("COMMENT", comment);
+        }
+
         qso = qso + "<EOR>";
 
         adif = adif + qso + "\n";
     });
 
-    qsodate = qsoList[0][0].replace("-", "").replace("-", "");
+    qsodate = qsoList[0][0]; // Keep in yyyy-mm-dd format
     const filename =
+        qsodate +
+        "_" +
         operator.replace("/", "-") +
         "_" +
         mySigInfo.replace("/", "-") +
-        "_" +
-        qsodate +
         ".adi";
     download(filename, adif);
 });
@@ -633,8 +662,8 @@ $(".js-download-fle").click(function () {
     fleContent += "\n# Log\ndate " + qsodate + "\n\n";
     fleContent += textAreaContent;
 
-    // Create filename
-    const filename = operator.replace("/", "-") + "_" + mySigInfo.replace("/", "-") + "_" + qsodate.replace(/-/g, "") + ".txt";
+    // Create filename with date first (yyyy-mm-dd format)
+    const filename = qsodate + "_" + operator.replace("/", "-") + "_" + mySigInfo.replace("/", "-") + ".txt";
 
     download(filename, fleContent);
 });
@@ -862,24 +891,13 @@ $(document).ready(function () {
     if (qsodate != null) {
         $("#qsodate").val(qsodate);
     } else {
-        // Set today's date as default
+        // Set today's date as default in dd/mm/yyyy format
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0');
         var yyyy = today.getFullYear();
 
-        // Format based on locale
-        const locale = navigator.language || navigator.userLanguage || 'en-US';
-        var dateStr = '';
-
-        if (locale.startsWith('en-GB') || locale.startsWith('en-AU') ||
-            locale.startsWith('en-NZ') || locale.startsWith('en-IE')) {
-            // UK/EU format: DD/MM/YYYY
-            dateStr = dd + '/' + mm + '/' + yyyy;
-        } else {
-            // US format: MM/DD/YYYY or ISO
-            dateStr = yyyy + '-' + mm + '-' + dd;
-        }
+        var dateStr = dd + '/' + mm + '/' + yyyy;
 
         $("#qsodate").val(dateStr);
     }

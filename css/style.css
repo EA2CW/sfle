@@ -56,16 +56,16 @@ tbody tr {
 }
 
 /* Column widths optimized for data */
-thead th:nth-child(1), tbody td:nth-child(1) { width: 10%; } /* Date */
-thead th:nth-child(2), tbody td:nth-child(2) { width: 7%; } /* Time */
+thead th:nth-child(1), tbody td:nth-child(1) { width: 9%; } /* Date */
+thead th:nth-child(2), tbody td:nth-child(2) { width: 6%; } /* Time */
 thead th:nth-child(3), tbody td:nth-child(3) { width: 13%; } /* Callsign */
 thead th:nth-child(4), tbody td:nth-child(4) { width: 7%; } /* Band */
 thead th:nth-child(5), tbody td:nth-child(5) { width: 7%; } /* Mode */
-thead th:nth-child(6), tbody td:nth-child(6) { width: 6%; } /* RS */
-thead th:nth-child(7), tbody td:nth-child(7) { width: 6%; } /* RR */
-thead th:nth-child(8), tbody td:nth-child(8) { width: 11%; } /* Op. */
-thead th:nth-child(9), tbody td:nth-child(9) { width: 10%; } /* Sig */
-thead th:nth-child(10), tbody td:nth-child(10) { width: 23%; } /* Sig Info */
+thead th:nth-child(6), tbody td:nth-child(6) { width: 5%; } /* RS */
+thead th:nth-child(7), tbody td:nth-child(7) { width: 5%; } /* RR */
+thead th:nth-child(8), tbody td:nth-child(8) { width: 10%; } /* Op. */
+thead th:nth-child(9), tbody td:nth-child(9) { width: 18%; } /* Sig Info */
+thead th:nth-child(10), tbody td:nth-child(10) { width: 20%; } /* Comment */
 
 tbody {
   overflow-y: scroll;
@@ -75,6 +75,24 @@ tbody {
 thead tr {
   background-color: #a9a9a9;
   color: #000;
+}
+
+/* Stacked cell layout for primary content with metadata */
+.cell-stacked {
+  vertical-align: top;
+  padding: 4px 8px !important;
+}
+
+.cell-primary {
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.cell-meta {
+  font-size: 0.75em;
+  color: #28a745;
+  line-height: 1.2;
+  margin-top: 2px;
 }
 
 [data-bs-theme="dark"] thead tr {
@@ -100,6 +118,21 @@ tbody tr:nth-child(odd) {
 
 [data-bs-theme="dark"] tbody tr {
   color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .cell-meta {
+  color: #5cb85c;
+}
+
+/* Comment cell styling */
+.comment-cell {
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+}
+
+[data-bs-theme="dark"] .comment-cell {
+  color: #aaa;
 }
 @media (min-width: 1200px) {
   .input-example {
