@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Grid Locator Validation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Maidenhead Locator Validation Tests</h1>
+    <div id="test-results"></div>
+
+    <script>
+        // Validate Maidenhead locator format (#IO84NJ)
+        // Supports 2, 4, 6, or 8 character locators (up to 4 pairs)
+        function isGridLocator(str) {
+            if (!str || typeof str !== 'string') {
+                return false;
+            }
+
+            // Must start with #
+            if (!str.startsWith('#')) {
+                return false;
+            }
+
+            // Remove the # prefix for validation
+            const locator = str.substring(1);
+
+            // Must be 2, 4, 6, or 8 characters (1-4 pairs)
+            if (locator.length < 2 || locator.length > 8 || locator.length % 2 !== 0) {
+                return false;
+            }
+
+            // Validate the pattern: pairs of letters, then numbers, then letters, then numbers
+            // First pair: 2 letters (field)
+            if (!/^[A-Ra-r]{2}/.test(locator)) {
+                return false;
+            }
+
+            // Second pair (if present): 2 digits (square)
+            if (locator.length >= 4 && !/^[A-Ra-r]{2}[0-9]{2}/.test(locator)) {
+                return false;
+            }
+
+            // Third pair (if present): 2 letters (subsquare)
+            if (locator.length >= 6 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}/.test(locator)) {
+                return false;
+            }
+
+            // Fourth pair (if present): 2 digits (extended square)
+            if (locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Test cases
+        const tests = [
+            // Valid cases
+            { input: '#IO', expected: true, description: '2 characters (field only)' },
+            { input: '#IO84', expected: true, description: '4 characters (field + square)' },
+            { input: '#IO84NJ', expected: true, description: '6 characters (field + square + subsquare)' },
+            { input: '#IO84NJ12', expected: true, description: '8 characters (full extended)' },
+            { input: '#io84nj', expected: true, description: 'lowercase should work' },
+            { input: '#Io84Nj', expected: true, description: 'mixed case should work' },
+
+            // Invalid cases
+            { input: 'IO84NJ', expected: false, description: 'missing # prefix' },
+            { input: '#I', expected: false, description: 'only 1 character' },
+            { input: '#IO8', expected: false, description: 'odd number of characters (3)' },
+            { input: '#IO84N', expected: false, description: 'odd number of characters (5)' },
+            { input: '#IO84NJ1', expected: false, description: 'odd number of characters (7)' },
+            { input: '#IO84NJ123', expected: false, description: 'too many characters (9)' },
+            { input: '#12', expected: false, description: 'first pair must be letters' },
+            { input: '#IOAA', expected: false, description: 'second pair must be digits' },
+            { input: '#IO8412', expected: false, description: 'third pair must be letters' },
+            { input: '#IO84NJAA', expected: false, description: 'fourth pair must be digits' },
+            { input: '#SO84NJ', expected: false, description: 'first letter out of range (S > R)' },
+            { input: '#IO84YJ', expected: false, description: 'third letter out of range (Y > X)' },
+            { input: '', expected: false, description: 'empty string' },
+            { input: null, expected: false, description: 'null value' },
+        ];
+
+        let passed = 0;
+        let failed = 0;
+        let results = '<h2>Test Results</h2><ul>';
+
+        tests.forEach(test => {
+            const result = isGridLocator(test.input);
+            const status = result === test.expected ? 'PASS' : 'FAIL';
+            const color = status === 'PASS' ? 'green' : 'red';
+
+            if (status === 'PASS') {
+                passed++;
+            } else {
+                failed++;
+            }
+
+            results += `<li style="color: ${color}">${status}: ${test.description} - Input: "${test.input}" - Expected: ${test.expected}, Got: ${result}</li>`;
+        });
+
+        results += '</ul>';
+        results += `<h3>Summary: ${passed} passed, ${failed} failed out of ${tests.length} tests</h3>`;
+
+        $('#test-results').html(results);
+    </script>
+</body>
+</html>
