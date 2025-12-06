@@ -148,6 +148,7 @@ function handleInput() {
     var callsign = "";
     var sig = "";
     var sigInfo = "";
+    var gridLocator = "";
     qsoList = [];
     $("#qsoTable tbody").empty();
 
@@ -178,6 +179,8 @@ function handleInput() {
                 qsotime = qsotime.replace(/.$/, item);
             } else if (item.match(/^[0-5][0-9]{1}$/) && qsotime && itemNumber === 0) {
                 qsotime = qsotime.slice(0, -2) + item;
+            } else if (isGridLocator(item)) {
+                gridLocator = item.substring(1).toUpperCase();
             } else if (isSigInfo(item)) {
                 sigInfo = item.toUpperCase();
                 sig = getSigFromSigInfo(sigInfo);
@@ -241,6 +244,7 @@ function handleInput() {
                 rst_s,
                 rst_r,
                 sigInfo,
+                gridLocator,
             ]);
             // console.log(row);
             const tableRow = $(`<tr>
@@ -270,6 +274,7 @@ function handleInput() {
 
             callsign = "";
             sigInfo = "";
+            gridLocator = "";
         }
 
         showErrors();
@@ -573,6 +578,11 @@ Internet: https://sfle.ok2cqr.com
             qso = qso + getAdifTag("MY_GRIDSQUARE", myGrid);
         }
 
+        let gridLocator = item[9];
+        if (gridLocator) {
+            qso = qso + getAdifTag("GRIDSQUARE", gridLocator);
+        }
+
         qso = qso + "<EOR>";
 
         adif = adif + qso + "\n";
@@ -726,6 +736,50 @@ function isSigInfo(str) {
     return isSotaInfo(str) || isPotaInfo(str) || isWotaInfo(str) || isWwffInfo(str);
 }
 
+// Validate Maidenhead locator format (#IO84NJ)
+// Supports 2, 4, 6, or 8 character locators (up to 4 pairs)
+function isGridLocator(str) {
+    if (!str || typeof str !== 'string') {
+        return false;
+    }
+
+    // Must start with #
+    if (!str.startsWith('#')) {
+        return false;
+    }
+
+    // Remove the # prefix for validation
+    const locator = str.substring(1);
+
+    // Must be 2, 4, 6, or 8 characters (1-4 pairs)
+    if (locator.length < 2 || locator.length > 8 || locator.length % 2 !== 0) {
+        return false;
+    }
+
+    // Validate the pattern: pairs of letters, then numbers, then letters, then numbers
+    // First pair: 2 letters (field)
+    if (!/^[A-Ra-r]{2}/.test(locator)) {
+        return false;
+    }
+
+    // Second pair (if present): 2 digits (square)
+    if (locator.length >= 4 && !/^[A-Ra-r]{2}[0-9]{2}/.test(locator)) {
+        return false;
+    }
+
+    // Third pair (if present): 2 letters (subsquare)
+    if (locator.length >= 6 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}/.test(locator)) {
+        return false;
+    }
+
+    // Fourth pair (if present): 2 digits (extended square)
+    if (locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator)) {
+        return false;
+    }
+
+    return true;
+}
+
 function download(filename, text) {
     var element = document.createElement("a");
     element.setAttribute(
@@ -807,6 +861,27 @@ $(document).ready(function () {
 
     if (qsodate != null) {
         $("#qsodate").val(qsodate);
+    } else {
+        // Set today's date as default
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+
+        // Format based on locale
+        const locale = navigator.language || navigator.userLanguage || 'en-US';
+        var dateStr = '';
+
+        if (locale.startsWith('en-GB') || locale.startsWith('en-AU') ||
+            locale.startsWith('en-NZ') || locale.startsWith('en-IE')) {
+            // UK/EU format: DD/MM/YYYY
+            dateStr = dd + '/' + mm + '/' + yyyy;
+        } else {
+            // US format: MM/DD/YYYY or ISO
+            dateStr = yyyy + '-' + mm + '-' + dd;
+        }
+
+        $("#qsodate").val(dateStr);
     }
 
     if (myPower != null) {
@@ -827,6 +902,27 @@ $(document).ready(function () {
 
     // Set date format hint based on locale
     setDateFormatHint();
+
+    // Initial sync of table height
+    syncTableHeight();
+
+    // Observe textarea for size changes
+    const textarea = document.querySelector('.qso-area');
+    if (textarea) {
+        resizeObserver.observe(textarea);
+
+        // Also add a periodic check to catch manual resizing
+        setInterval(function() {
+            const currentHeight = textarea.offsetHeight;
+            if (currentHeight !== textarea._lastHeight) {
+                textarea._lastHeight = currentHeight;
+                debouncedSyncTableHeight();
+            }
+        }, 200);
+
+        // Initialize the last height
+        textarea._lastHeight = textarea.offsetHeight;
+    }
 });
 
 function setDateFormatHint() {
@@ -876,3 +972,73 @@ function setDateFormatHint() {
     // Set title attribute for additional help
     $('#qsodate').attr('title', 'Enter date in ' + formatPattern + ' format');
 }
+
+// Sync table height to match textarea + buttons
+let lastKnownHeight = 0;
+
+function syncTableHeight() {
+    const textarea = $('.qso-area');
+
+    if (textarea.length === 0) {
+        return;
+    }
+
+    const textareaOffset = textarea.offset();
+    if (!textareaOffset) {
+        return;
+    }
+
+    // Find the button container
+    const buttonContainer = textarea.closest('.row').next('.row');
+
+    if (buttonContainer.length === 0) {
+        return;
+    }
+
+    const buttonOffset = buttonContainer.offset();
+    if (!buttonOffset) {
+        return;
+    }
+
+    // Calculate total height: from top of textarea to bottom of buttons
+    const textareaTop = textareaOffset.top;
+    const buttonBottom = buttonOffset.top + buttonContainer.outerHeight();
+    const totalHeight = buttonBottom - textareaTop;
+
+    const qsoList = $('.qsoList');
+    const qsoListOffset = qsoList.offset();
+
+    if (!qsoListOffset) {
+        return;
+    }
+
+    const qsoListTop = qsoListOffset.top;
+
+    // Make the table the same total height as textarea + buttons
+    const qsoListHeight = totalHeight;
+
+    // Only update if height has actually changed
+    if (Math.abs(qsoListHeight - lastKnownHeight) < 5) {
+        return;
+    }
+
+    lastKnownHeight = qsoListHeight;
+
+    const headerHeight = $('#qsoTable thead').outerHeight() || 40;
+    const bodyHeight = qsoListHeight - headerHeight;
+
+    qsoList.height(qsoListHeight);
+    $('#qsoTableBody').css('max-height', bodyHeight + 'px');
+}
+
+// Debounce function to prevent rapid updates
+let resizeTimeout;
+function debouncedSyncTableHeight() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(syncTableHeight, 50);
+}
+
+// Watch for textarea resize only (not the entire column)
+const resizeObserver = new ResizeObserver(function(entries) {
+    debouncedSyncTableHeight();
+});
