@@ -5,8 +5,7 @@
 	<title>Simple fast log entry</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-		integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="/css/style.css?v=202404270842" class="rel">
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -98,8 +97,8 @@
 						<div class="row">
 							<div class="col-xs-12 col-lg-12 col-xl-6">
 								<div class="form-group">
-									<label for="qsodate">QSO date <span class="text-muted input-example js-date-format-hint"></span></label>
-									<input type="text" class="form-control" id="qsodate" placeholder="dd/mm/yyyy">
+									<label for="qsodate">QSO date</label>
+									<input type="date" class="form-control" id="qsodate">
 								</div>
 							</div>
 						</div>
@@ -149,9 +148,8 @@
 						</div>
 						<div class="row">
 							<div class="col">
-								<p class="mt-1 mb-0">Enter the data</p>
-								<textarea name="qso" class="form-control qso-area" cols="auto" rows="11">
-
+								<label for="qso-data" class="mt-1 mb-0">Enter the data</label>
+								<textarea id="qso-data" name="qso" class="form-control qso-area" cols="auto" rows="11">
 								</textarea>
 								<span class="js-power text-muted"></span><span class="js-my-grid text-muted"></span>
 							</div>
@@ -167,6 +165,13 @@
 								<button class="btn btn-warning js-download-fle w-100">Download FLE</button>
 							</div>
 							<div class="col-6">
+								<button class="btn btn-warning js-download-csv w-100">Download CSV</button>
+							</div>
+							<div class="col-6">
+								<button class="btn btn-info js-import-fle w-100">Import FLE</button>
+								<input type="file" id="fle-file-input" accept=".txt" style="display: none;">
+							</div>
+							<div class="col-6">
 								<button class="btn btn-danger js-empty-qso w-100">Clear logging session</button>
 							</div>
 							<div class="col-12">
@@ -175,8 +180,8 @@
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-8">
-						QSO list
-						<div class="qsoList">
+						<label for="qso-list">QSO list</label>
+						<div id="qso-list" class="qsoList">
 							<table class="table table-condensed table-striped table-sm" id="qsoTable">
 								<thead>
 									<tr>
@@ -185,8 +190,8 @@
 										<th>Callsign</th>
 										<th>Band</th>
 										<th>Mode</th>
-										<th>RS</th>
-										<th>RR</th>
+										<th>RSTs</th>
+										<th>RSTr</th>
 										<th>Op.</th>
                                         <th>Sig</th>
                                         <th>Comment</th>
@@ -431,12 +436,8 @@
 			</span>
 		</div>
 	</footer>
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-		crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-		crossorigin="anonymous"></script>
+	<script src="/js/jquery-3.7.1.min.js"></script>
+	<script src="/js/bootstrap.bundle.js"></script>
 	<script src="/js/app.js?v=202501040916"></script>
 	<script src="/js/theme-toggle.js"></script>
 </body>

@@ -66,7 +66,7 @@ var Bands = {
     },
 };
 
-var $textarea = $("textarea");
+var $textarea = $('.qso-area');
 var qsodate = "";
 var qsotime = "";
 var band = "";
@@ -123,15 +123,9 @@ function handleInput() {
     var qsodate = "";
     var dateInput = $("#qsodate").val();
 
+    // HTML5 date input already returns yyyy-mm-dd format
     if (dateInput) {
-        var parsedDate = parseDateInput(dateInput);
-        if (parsedDate) {
-            qsodate = parsedDate;
-            // Update the input field with ISO format for consistency
-            $("#qsodate").attr('data-iso-date', qsodate);
-        } else {
-            qsodate = new Date().toISOString().split("T")[0];
-        }
+        qsodate = dateInput;
     } else {
         qsodate = new Date().toISOString().split("T")[0];
     }
@@ -260,7 +254,7 @@ function handleInput() {
             // console.log(row);
 
             // Build callsign cell with optional grid locator underneath
-            let callsignCell = `<div class="cell-primary">${callsign}</div>`;
+            let callsignCell = `<div class="cell-primary"><a href="https://qrz.com/db/${callsign}" target="_blank" rel="noopener noreferrer">${callsign}</a></div>`;
             if (gridLocator) {
                 callsignCell += `<div class="cell-meta">${gridLocator}</div>`;
             }
@@ -304,7 +298,7 @@ function handleInput() {
         showErrors();
     }); //lines.forEach((row)
 
-    // Scroll to the bototm of #qsoTableBody (scroll by the value of its scrollheight property)
+    // Scroll to the bottom of #qsoTableBody (scroll by the value of its scrollheight property)
     $("#qsoTableBody").scrollTop($('#qsoTableBody').get(0).scrollHeight);
 
     var qsoCount = qsoList.length;
@@ -330,7 +324,7 @@ function checkMainFieldsErrors() {
 }
 
 $textarea.keydown(function (event) {
-    if (event.which == 13) {
+    if (event.which === 13) {
         handleInput();
     }
 });
@@ -343,7 +337,7 @@ $textarea.focus(function () {
 
 function addErrorMessage(errorMessage) {
     errorMessage = '<span class="text-danger">' + errorMessage + "</span>";
-    if (errors.includes(errorMessage) == false) {
+    if (errors.includes(errorMessage) === false) {
         errors.push(errorMessage);
     }
 }
@@ -407,17 +401,21 @@ CW
   `;
 
     $textarea.val(logData.trim());
-    if ($("#my-call").val() === "") {
-        $("#my-call").val("OK2CQR/P");
+    const myCall = $("#my-call");
+    if (myCall.val() === "") {
+        myCall.val("OK2CQR/P");
     }
-    if ($("#operator").val() === "") {
-        $("#operator").val("OK2CQR");
+    const operator = $("#operator");
+    if (operator.val() === "") {
+        operator.val("OK2CQR");
     }
-    if ($("#my-sig").val() === "") {
-        $("#my-sig").val("SOTA");
+    const mySig = $("#my-sig");
+    if (mySig.val() === "") {
+        mySig.val("SOTA");
     }
-    if ($("#my-sig-ref").val() === "") {
-        $("#my-sig-ref").val("OKFF-2068");
+    const mySigRef = $("#my-sig-ref");
+    if (mySigRef.val() === "") {
+        mySigRef.val("OKFF-2068");
     }
 
     handleInput();
@@ -514,15 +512,13 @@ for (const [key, value] of Object.entries(Bands)) {
 $(".js-band-settings").html(htmlSettings);
 
 $(".js-download-adif").click(function () {
-    var operator = $("#operator").val();
-    operator = operator.toUpperCase();
-    var ownCallsign = $("#my-call").val().toUpperCase();
-    ownCallsign = ownCallsign.toUpperCase();
-    var mySig = $("#my-sig").val().toUpperCase();
-    var mySigInfo = $("#my-sig-ref").val().toUpperCase();
+    const operator = $("#operator").val().toUpperCase();
+    const ownCallsign = $("#my-call").val().toUpperCase();
+    const mySig = $("#my-sig").val().toUpperCase();
+    const mySigInfo = $("#my-sig-ref").val().toUpperCase();
 
-    var myPower = $("#my-power").val();
-    var myGrid = $("#my-grid").val().toUpperCase();
+    const myPower = $("#my-power").val();
+    const myGrid = $("#my-grid").val().toUpperCase();
 
     const adifHeader = `
 ADIF export from Simple fast log entry by Petr, OK2CQR
@@ -552,19 +548,19 @@ Internet: https://sfle.ok2cqr.com
         qso = qso + getAdifTag("BAND", item[4]);
         qso = qso + getAdifTag("MODE", item[5]);
 
-        var rst = item[6];
-        settingsMode = getSettingsMode(rst);
+        var rsts = item[6];
+        settingsMode = getSettingsMode(rsts);
         if (settingsMode === "SSB") {
-            rst = "59";
+            rsts = "59";
         }
-        qso = qso + getAdifTag("RST_SENT", rst);
+        qso = qso + getAdifTag("RST_SENT", rsts);
 
-        var rst = item[7];
-        settingsMode = getSettingsMode(rst);
+        var rstr = item[7];
+        settingsMode = getSettingsMode(rstr);
         if (settingsMode === "SSB") {
-            rst = "59";
+            rstr = "59";
         }
-        qso = qso + getAdifTag("RST_RCVD", rst);
+        qso = qso + getAdifTag("RST_RCVD", rstr);
 
         qso = qso + getAdifTag("OPERATOR", operator);
         qso = qso + getAdifTag("STATION_CALLSIGN", ownCallsign);
@@ -634,18 +630,13 @@ $(".js-download-fle").click(function () {
     var ownCallsign = $("#my-call").val().toUpperCase();
     var mySig = $("#my-sig").val().toUpperCase();
     var mySigInfo = $("#my-sig-ref").val().toUpperCase();
-    var qsodate = "";
+    var qsodate;
 
-    var dateInput = $("#qsodate").val();
-    if (dateInput) {
-        var parsedDate = parseDateInput(dateInput);
-        if (parsedDate) {
-            qsodate = parsedDate;
-        } else {
-            qsodate = new Date().toISOString().split("T")[0];
-        }
-    } else {
+    const dateInput = $("#qsodate").val();
+    if (!dateInput) {
         qsodate = new Date().toISOString().split("T")[0];
+    } else {
+        qsodate = dateInput;
     }
 
     var textAreaContent = $("textarea[name='qso']").val();
@@ -659,7 +650,17 @@ $(".js-download-fle").click(function () {
         fleContent += "my" + mySig.toLowerCase() + " " + mySigInfo.toLowerCase() + "\n";
     }
 
-    fleContent += "\n# Log\ndate " + qsodate + "\n\n";
+    fleContent += "\n# Log\ndate " + qsodate + "\n";
+
+    // Add MY_SIG and MY_SIG_INFO as comments
+    if (mySig) {
+        fleContent += "# MY_SIG " + mySig + "\n";
+    }
+    if (mySigInfo) {
+        fleContent += "# MY_SIG_INFO " + mySigInfo + "\n";
+    }
+
+    fleContent += "\n";
     fleContent += textAreaContent;
 
     // Create filename with date first (yyyy-mm-dd format)
@@ -667,6 +668,230 @@ $(".js-download-fle").click(function () {
 
     download(filename, fleContent);
 });
+
+$(".js-download-csv").click(function () {
+    var myCall = $("#my-call").val().toUpperCase();
+    var mySigInfo = $("#my-sig-ref").val().toUpperCase();
+    var operator = $("#operator").val().toUpperCase();
+
+    var dateInput = $("#qsodate").val();
+    const qsodate = dateInput ? dateInput : new Date().toISOString().split("T")[0];
+
+    // Helper function to escape CSV fields
+    function escapeCsvField(field) {
+        if (field == null || field === '') {
+            return '';
+        }
+        // Convert to string
+        field = String(field);
+        // If field contains comma, quote, or newline, wrap in quotes and escape quotes
+        if (field.includes(',') || field.includes('"') || field.includes('\n') || field.includes('\r')) {
+            return '"' + field.replace(/"/g, '""') + '"';
+        }
+        return field;
+    }
+
+    // Helper function to convert band to MHz
+    function bandToMhz(band) {
+        const bandMap = {
+            '160M': '1.8',
+            '80M': '3.5',
+            '60M': '5',
+            '40M': '7',
+            '30M': '10',
+            '20M': '14',
+            '17M': '18',
+            '15M': '21',
+            '12M': '24',
+            '10M': '28',
+            '6M': '50',
+            '2M': '144',
+            '70CM': '432'
+        };
+        return bandMap[band.toUpperCase()] || band;
+    }
+
+    // Helper function to format date as dd/mm/yy
+    function formatDateDDMMYY(dateStr) {
+        // dateStr is in yyyy-mm-dd format
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            const year = parts[0].substring(2); // Get last 2 digits of year
+            const month = parts[1];
+            const day = parts[2];
+            return day + '/' + month + '/' + year;
+        }
+        return dateStr;
+    }
+
+    // Build CSV content
+    var csvContent = "";
+
+    // Process each QSO
+    qsoList.forEach((item) => {
+        const date = formatDateDDMMYY(item[0]);
+        const time = item[1].replace(':', ''); // Remove colon from time (hhmm format)
+        const callsign = item[2];
+        const freq = item[3];
+        const band = item[4];
+        const mode = item[5];
+        const sigInfo = item[8] || '';
+        const comment = item[10] || '';
+
+        // Convert band to MHz if we have a band
+        const bandMhz = band ? bandToMhz(band) : freq;
+
+        // Build CSV line with proper escaping
+        const csvLine = [
+            'V2',
+            escapeCsvField(myCall),
+            escapeCsvField(mySigInfo),
+            escapeCsvField(date),
+            escapeCsvField(time),
+            escapeCsvField(bandMhz),
+            escapeCsvField(mode),
+            escapeCsvField(callsign),
+            escapeCsvField(sigInfo),
+            escapeCsvField(comment)
+        ].join(',');
+
+        csvContent += csvLine + '\n';
+    });
+
+    // Create filename with date first (yyyy-mm-dd format)
+    const filename = qsodate + "_" + operator.replace("/", "-") + "_" + mySigInfo.replace("/", "-") + ".csv";
+
+    download(filename, csvContent);
+});
+
+$(".js-import-fle").click(function () {
+    // Check if there's existing data in the textarea
+    var currentData = $("textarea[name='qso']").val().trim();
+
+    if (currentData) {
+        // Ask user for confirmation to overwrite
+        if (!confirm("You have existing QSO data. Do you want to overwrite it with the imported file?")) {
+            return; // User cancelled, don't proceed
+        }
+    }
+
+    // Trigger the hidden file input
+    $("#fle-file-input").click();
+});
+
+// Handle file selection
+$("#fle-file-input").change(function (event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return; // No file selected
+    }
+
+    // Check if it's a text file
+    if (!file.name.endsWith('.txt')) {
+        alert("Please select a valid FLE file (.txt)");
+        // Reset the file input
+        event.target.value = '';
+        return;
+    }
+
+    // Read the file
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        const content = e.target.result;
+
+        // Parse the FLE file
+        parseFLEFile(content);
+
+        // Reset the file input so the same file can be selected again
+        event.target.value = '';
+    };
+
+    reader.onerror = function () {
+        alert("Error reading file. Please try again.");
+        event.target.value = '';
+    };
+
+    reader.readAsText(file);
+});
+
+function parseFLEFile(content) {
+    // Parse FLE file format
+    const lines = content.split('\n');
+    let operator = '';
+    let myCall = '';
+    let mySig = '';
+    let mySigRef = '';
+    let qsoDate = '';
+    let qsoData = [];
+    let inLogSection = false;
+
+    lines.forEach(line => {
+        line = line.trim();
+
+        // Skip empty lines
+        if (line === '') {
+            return;
+        }
+
+        // Parse header fields
+        if (line.startsWith('operator ')) {
+            operator = line.substring(9).trim().toUpperCase();
+        } else if (line.startsWith('mycall ')) {
+            myCall = line.substring(7).trim().toUpperCase();
+        } else if (line.startsWith('mysota ')) {
+            mySig = 'SOTA';
+            mySigRef = line.substring(7).trim().toUpperCase();
+        } else if (line.startsWith('mypota ')) {
+            mySig = 'POTA';
+            mySigRef = line.substring(7).trim().toUpperCase();
+        } else if (line.startsWith('mywwff ')) {
+            mySig = 'WWFF';
+            mySigRef = line.substring(7).trim().toUpperCase();
+        } else if (line.startsWith('mywota ')) {
+            mySig = 'WOTA';
+            mySigRef = line.substring(7).trim().toUpperCase();
+        } else if (line.startsWith('date ')) {
+            qsoDate = line.substring(5).trim();
+            inLogSection = true;
+        } else if (line.startsWith('# MY_SIG ')) {
+            mySig = line.substring(9).trim().toUpperCase();
+        } else if (line.startsWith('# MY_SIG_INFO ')) {
+            mySigRef = line.substring(14).trim().toUpperCase();
+        } else if (inLogSection) {
+            // This is QSO data - add it to the array (skip comments)
+            if (line && !line.startsWith('#')) {
+                qsoData.push(line);
+            }
+        }
+    });
+
+    // Update form fields
+    if (operator) {
+        $("#operator").val(operator);
+    }
+    if (myCall) {
+        $("#my-call").val(myCall);
+    }
+    if (mySig) {
+        $("#my-sig").val(mySig);
+    }
+    if (mySigRef) {
+        $("#my-sig-ref").val(mySigRef);
+    }
+    if (qsoDate) {
+        $("#qsodate").val(qsoDate);
+    }
+
+    // Update textarea with QSO data
+    if (qsoData.length > 0) {
+        $("textarea[name='qso']").val(qsoData.join('\n'));
+    }
+
+    // Trigger handleInput to reload the QSO list
+    handleInput();
+}
 
 function isBandModeEntered() {
     let isBandModeOK = true;
@@ -712,7 +937,7 @@ function getReportByMode(rst, mode) {
 }
 
 function isSotaInfo(value) {
-    return (value.match(/^[A-Z]*[A-Z]\/[A-Z]{2}-\d{3}$/i));
+    return (value.match(/^[A-Z]*[A-Z][0-9]*\/[A-Z]{2}-\d{3}$/i));
 }
 
 function isWwffInfo(value) {
@@ -802,11 +1027,7 @@ function isGridLocator(str) {
     }
 
     // Fourth pair (if present): 2 digits (extended square)
-    if (locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator)) {
-        return false;
-    }
-
-    return true;
+    return !(locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator));
 }
 
 function download(filename, text) {
@@ -891,14 +1112,9 @@ $(document).ready(function () {
     if (qsodate != null) {
         $("#qsodate").val(qsodate);
     } else {
-        // Set today's date as default in dd/mm/yyyy format
+        // Set today's date as default in yyyy-mm-dd format (ISO format for HTML5 date input)
         var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var yyyy = today.getFullYear();
-
-        var dateStr = dd + '/' + mm + '/' + yyyy;
-
+        var dateStr = today.toISOString().split('T')[0];
         $("#qsodate").val(dateStr);
     }
 
@@ -917,9 +1133,6 @@ $(document).ready(function () {
 
     loadPowerSettings();
     loadMyGridSettings();
-
-    // Set date format hint based on locale
-    setDateFormatHint();
 
     // Initial sync of table height
     syncTableHeight();
@@ -942,54 +1155,6 @@ $(document).ready(function () {
         textarea._lastHeight = textarea.offsetHeight;
     }
 });
-
-function setDateFormatHint() {
-    // Get user's locale
-    const locale = navigator.language || navigator.userLanguage || 'en-US';
-
-    // Create a sample date to determine format
-    const sampleDate = new Date(2025, 2, 9); // March 9, 2025
-
-    // Format the date according to locale
-    const formatter = new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-    });
-
-    const formattedDate = formatter.format(sampleDate);
-
-    // Determine the format pattern from the formatted date
-    let formatPattern = '';
-
-    // Common patterns based on formatted output
-    if (formattedDate.includes('/')) {
-        // US format: MM/DD/YYYY or others
-        const parts = formattedDate.split('/');
-        if (parts[0] === '03') {
-            formatPattern = 'dd/mm/yyyy';
-        } else if (parts[0] === '09') {
-            formatPattern = 'dd/mm/yyyy';
-        } else {
-            formatPattern = 'mm/dd/yyyy';
-        }
-    } else if (formattedDate.includes('-')) {
-        formatPattern = 'yyyy-mm-dd';
-    } else if (formattedDate.includes('.')) {
-        formatPattern = 'dd.mm.yyyy';
-    } else {
-        formatPattern = 'yyyy-mm-dd';
-    }
-
-    // Display the hint
-    $('.js-date-format-hint').text('e.g. ' + formatPattern);
-
-    // Set placeholder on the input field
-    $('#qsodate').attr('placeholder', formatPattern);
-
-    // Set title attribute for additional help
-    $('#qsodate').attr('title', 'Enter date in ' + formatPattern + ' format');
-}
 
 // Sync table height to match textarea + buttons
 let lastKnownHeight = 0;
@@ -1029,8 +1194,6 @@ function syncTableHeight() {
     if (!qsoListOffset) {
         return;
     }
-
-    const qsoListTop = qsoListOffset.top;
 
     // Make the table the same total height as textarea + buttons
     const qsoListHeight = totalHeight;
