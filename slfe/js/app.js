@@ -182,7 +182,20 @@ function handleInput() {
             } else if (item.match(/^[1-9]{1}$/) && qsotime && itemNumber === 0) {
                 qsotime = qsotime.replace(/.$/, item);
             } else if (item.match(/^[0-5][0-9]{1}$/) && qsotime && itemNumber === 0) {
-                qsotime = qsotime.slice(0, -2) + item;
+                // Extract current hour and minute
+                const currentHour = parseInt(qsotime.slice(0, 2), 10);
+                const currentMinute = parseInt(qsotime.slice(2, 4), 10);
+                const newMinute = parseInt(item, 10);
+
+                // Check if we've rolled over to the next hour
+                let newHour = currentHour;
+                if (newMinute < currentMinute) {
+                    // Rollover detected - increment hour
+                    newHour = (currentHour + 1) % 24;
+                }
+
+                // Format the new time
+                qsotime = String(newHour).padStart(2, '0') + item;
             } else if (isGridLocator(item)) {
                 gridLocator = item.substring(1).toUpperCase();
             } else if (isSigInfo(item)) {
