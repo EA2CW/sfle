@@ -132,8 +132,6 @@ function handleInput() {
 
     var operator = $("#operator").val();
     operator = operator.toUpperCase();
-    var ownCallsign = $("#my-call").val().toUpperCase();
-    ownCallsign = ownCallsign.toUpperCase();
 
     var extraQsoDate = qsodate;
     var band = "";
