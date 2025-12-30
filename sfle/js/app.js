@@ -241,13 +241,8 @@ function handleInput() {
                 extraQsoDate = qsodate;
             }
 
-            console.log(rst_s);
-            console.log(rst_r);
             rst_s = getReportByMode(rst_s, mode);
             rst_r = getReportByMode(rst_r, mode);
-            console.log(rst_s);
-            console.log(rst_r);
-
 
             qsoList.push([
                 extraQsoDate,
@@ -262,7 +257,6 @@ function handleInput() {
                 gridLocator,
                 comment,
             ]);
-            // console.log(row);
 
             // Build callsign cell with optional grid locator underneath
             let callsignCell = `<div class="cell-primary"><a href="https://qrz.com/db/${callsign}" target="_blank" rel="noopener noreferrer">${callsign}</a></div>`;
