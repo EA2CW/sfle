@@ -517,6 +517,9 @@ for (const [key, value] of Object.entries(Bands)) {
 $(".js-band-settings").html(htmlSettings);
 
 $(".js-download-adif").click(function () {
+    // Reload QSO list to ensure it's up-to-date with any text edits
+    handleInput();
+
     const operator = $("#operator").val().toUpperCase();
     const ownCallsign = $("#my-call").val().toUpperCase();
     const mySig = $("#my-sig").val().toUpperCase();
@@ -630,6 +633,9 @@ Internet: https://sfle.ok2cqr.com
 });
 
 $(".js-download-fle").click(function () {
+    // Reload QSO list to ensure it's up-to-date with any text edits
+    handleInput();
+
     var operator = $("#operator").val();
     operator = operator.toUpperCase();
     var ownCallsign = $("#my-call").val().toUpperCase();
@@ -675,6 +681,9 @@ $(".js-download-fle").click(function () {
 });
 
 $(".js-download-csv").click(function () {
+    // Reload QSO list to ensure it's up-to-date with any text edits
+    handleInput();
+
     var myCall = $("#my-call").val().toUpperCase();
     var mySigInfo = $("#my-sig-ref").val().toUpperCase();
     var operator = $("#operator").val().toUpperCase();
@@ -946,9 +955,8 @@ function isSotaInfo(value) {
 }
 
 function isWwffInfo(value) {
-    return (value.match(/^[A-Z]*[F]{2}-\d{4}$/i));
+    return (value.match(/^[A-Z]{1,3}F{2}-\d{4}$/i));
 }
-
 function isPotaInfo(str) {
     // Return false for empty or null/undefined strings
     if (!str || typeof str !== 'string') {
@@ -966,10 +974,11 @@ function isPotaInfo(str) {
 }
 
 function getSigFromSigInfo(sigInfo) {
-    if (isPotaInfo(sigInfo)) {
-        return "POTA";
-    } else if (isWwffInfo(sigInfo)) {
+    // Check WWFF first since it has a more specific pattern (requires "FF")
+    if (isWwffInfo(sigInfo)) {
         return "WWFF";
+    } else if (isPotaInfo(sigInfo)) {
+        return "POTA";
     } else if (isWotaInfo(sigInfo)) {
         return "WOTA";
     } else if (isSotaInfo(sigInfo)) {
