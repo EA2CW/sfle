@@ -92,8 +92,8 @@
 
 		<div class="tab-content" id="myTabContent">
 			<div class="tab-pane fade show active" id="qso" role="tabpanel" aria-labelledby="qso-tab">
-				<div class="row mt-4">
-					<div class="col-xs-12 col-md-4">
+				<div class="resizable-container mt-4">
+					<div class="resizable-panel" id="form-panel">
 						<div class="row">
 							<div class="col-xs-12 col-lg-12 col-xl-6">
 								<div class="form-group">
@@ -103,31 +103,70 @@
 							</div>
 						</div>
                         <div class="row">
+                            <div class="col-xs-12">
+                                <label>Activities <span class="text-muted input-example">(check all that apply)</span></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-4">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="my-sota-enabled"> SOTA
+                                        </label>
+                                    </div>
+                                    <input type="text" class="form-control text-uppercase" id="my-sota-ref" placeholder="e.g. OK/PL-001" disabled>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-lg-4">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="my-pota-enabled"> POTA
+                                        </label>
+                                    </div>
+                                    <input type="text" class="form-control text-uppercase" id="my-pota-ref" placeholder="e.g. K-1234" disabled>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-lg-4">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="my-wwff-enabled"> WWFF
+                                        </label>
+                                    </div>
+                                    <input type="text" class="form-control text-uppercase" id="my-wwff-ref" placeholder="e.g. OKFF-2068" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-xs-12 col-lg-6">
                                 <div class="form-group">
-                                    <label for="my-sig">SIG <span class="text-muted input-example">e.g.
-											SOTA</span></label>
-                                    <input type="text" class="form-control text-uppercase" id="my-sig" list="sig-list" placeholder="Select or type SIG..." autofocus>
+                                    <label for="my-sig">Other Activity <span class="text-muted input-example">e.g. IOTA</span></label>
+                                    <input type="text" class="form-control text-uppercase" id="my-sig" list="sig-list" placeholder="Select or type...">
                                     <datalist id="sig-list">
-                                        <option value="SOTA">
-                                        <option value="WWFF">
-                                        <option value="POTA">
+                                        <option value="IOTA">
                                         <option value="WOTA">
+                                        <option value="GMA">
                                         <option value="HEMA">
                                         <option value="LOTA">
                                         <option value="ROTA">
-                                        <option value="IOTA">
-                                        <option value="GMA">
                                         <option value="BOTA">
                                     </datalist>
                                 </div>
                             </div>
                             <div class="col-xs-12 col-lg-6">
                                 <div class="form-group">
-                                    <label for="my-sig-ref">Ref <span class="text-muted input-example">e.g.
-											OKFF-2068</span></label>
-                                    <input type="text" class="form-control text-uppercase" id="my-sig-ref" autofocus>
+                                    <label for="my-sig-ref">Ref <span class="text-muted input-example">e.g. NA-001</span></label>
+                                    <input type="text" class="form-control text-uppercase" id="my-sig-ref" disabled>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <p class="text-muted" style="font-size: 0.9em; margin-top: -10px;">
+                                    <i class="fa fa-info-circle"></i> Check all activities you're activating simultaneously. Reference fields are required when checked.
+                                </p>
                             </div>
                         </div>
 						<div class="row">
@@ -148,7 +187,13 @@
 						</div>
 						<div class="row">
 							<div class="col">
-								<label for="qso-data" class="mt-1 mb-0">Enter the data</label>
+								<div class="d-flex justify-content-between align-items-center mt-1 mb-0">
+									<label for="qso-data">Enter the data</label>
+									<div class="font-size-controls">
+										<button type="button" class="btn btn-sm btn-outline-secondary js-decrease-font" title="Decrease font size">−</button>
+										<button type="button" class="btn btn-sm btn-outline-secondary js-increase-font" title="Increase font size">+</button>
+									</div>
+								</div>
 								<textarea id="qso-data" name="qso" class="form-control qso-area" cols="auto" rows="11">
 								</textarea>
 								<span class="js-power text-muted"></span><span class="js-my-grid text-muted"></span>
@@ -179,7 +224,8 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-xs-12 col-md-8">
+					<div class="resizable-splitter" id="vertical-splitter"></div>
+					<div class="resizable-panel" id="table-panel">
 						<label for="qso-list">QSO list</label>
 						<div id="qso-list" class="qsoList">
 							<table class="table table-condensed table-striped table-sm" id="qsoTable">

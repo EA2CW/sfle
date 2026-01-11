@@ -244,6 +244,12 @@ function handleInput() {
             rst_s = getReportByMode(rst_s, mode);
             rst_r = getReportByMode(rst_r, mode);
 
+            // Collect all activity data from form fields
+            var sotaRef = $("#my-sota-enabled").is(":checked") ? $("#my-sota-ref").val() : "";
+            var potaRef = $("#my-pota-enabled").is(":checked") ? $("#my-pota-ref").val() : "";
+            var wwffRef = $("#my-wwff-enabled").is(":checked") ? $("#my-wwff-ref").val() : "";
+            var otherSig = $("#my-sig").val() ? $("#my-sig").val() + ":" + $("#my-sig-ref").val() : "";
+
             qsoList.push([
                 extraQsoDate,
                 qsotime,
@@ -256,6 +262,10 @@ function handleInput() {
                 sigInfo,
                 gridLocator,
                 comment,
+                sotaRef,    // [11]
+                potaRef,    // [12]
+                wwffRef,    // [13]
+                otherSig,   // [14]
             ]);
 
             // Build callsign cell with optional grid locator underneath
@@ -264,7 +274,8 @@ function handleInput() {
                 callsignCell += `<div class="cell-meta">${gridLocator}</div>`;
             }
 
-            // Build sigInfo cell with optional sig underneath
+            // Build sigInfo cell for the OTHER station's activity (not MY_* fields)
+            // sigInfo comes from the log entry itself (e.g., user types "OK/PL-001" or "K-1234")
             let sigInfoCell = sigInfo ? `<div class="cell-primary">${sigInfo}</div>` : '';
             if (sig && sigInfo) {
                 sigInfoCell += `<div class="cell-meta">${sig}</div>`;
@@ -294,6 +305,13 @@ function handleInput() {
             localStorage.setItem("qsodate", $("#qsodate").val());
             localStorage.setItem("my-power", $("#my-power").val());
             localStorage.setItem("my-grid", $("#my-grid").val());
+            // Save new activity fields and checkbox states
+            localStorage.setItem("my-sota-enabled", $("#my-sota-enabled").is(":checked"));
+            localStorage.setItem("my-sota-ref", $("#my-sota-ref").val());
+            localStorage.setItem("my-pota-enabled", $("#my-pota-enabled").is(":checked"));
+            localStorage.setItem("my-pota-ref", $("#my-pota-ref").val());
+            localStorage.setItem("my-wwff-enabled", $("#my-wwff-enabled").is(":checked"));
+            localStorage.setItem("my-wwff-ref", $("#my-wwff-ref").val());
 
             callsign = "";
             sigInfo = "";
@@ -573,15 +591,35 @@ Internet: https://sfle.ok2cqr.com
         qso = qso + getAdifTag("OPERATOR", operator);
         qso = qso + getAdifTag("STATION_CALLSIGN", ownCallsign);
 
-        if (mySig === 'SOTA') {
-            qso = qso + getAdifTag("MY_SOTA_REF", mySigInfo);
-        } else if (mySig === 'POTA') {
-            qso = qso + getAdifTag("MY_POTA_REF", mySigInfo);
-        } else if (mySig === 'WWFF') {
-            qso = qso + getAdifTag("MY_WWFF_REF", mySigInfo);
-        } else {
-            qso = qso + getAdifTag("MY_SIG", mySig);
-            qso = qso + getAdifTag("MY_SIG_INFO", mySigInfo);
+        // Export all checked activities using dedicated fields and MY_SIG/MY_SIG_INFO
+        if (item[11]) { // sotaRef
+            qso = qso + getAdifTag("MY_SOTA_REF", item[11]);
+        }
+        if (item[12]) { // potaRef
+            qso = qso + getAdifTag("MY_POTA_REF", item[12]);
+        }
+        if (item[13]) { // wwffRef
+            qso = qso + getAdifTag("MY_WWFF_REF", item[13]);
+        }
+        if (item[14]) { // otherSig (format: "TYPE:REF")
+            var otherParts = item[14].split(":");
+            if (otherParts.length === 2) {
+                qso = qso + getAdifTag("MY_SIG", otherParts[0]);
+                qso = qso + getAdifTag("MY_SIG_INFO", otherParts[1]);
+            }
+        }
+        // Backward compatibility: handle old single activity format if no new activities
+        if (!item[11] && !item[12] && !item[13] && !item[14]) {
+            if (mySig === 'SOTA') {
+                qso = qso + getAdifTag("MY_SOTA_REF", mySigInfo);
+            } else if (mySig === 'POTA') {
+                qso = qso + getAdifTag("MY_POTA_REF", mySigInfo);
+            } else if (mySig === 'WWFF') {
+                qso = qso + getAdifTag("MY_WWFF_REF", mySigInfo);
+            } else if (mySig) {
+                qso = qso + getAdifTag("MY_SIG", mySig);
+                qso = qso + getAdifTag("MY_SIG_INFO", mySigInfo);
+            }
         }
 
         let sigInfo = item[8];
@@ -622,13 +660,26 @@ Internet: https://sfle.ok2cqr.com
     });
 
     qsodate = qsoList[0][0]; // Keep in yyyy-mm-dd format
-    const filename =
-        qsodate +
-        "_" +
-        operator.replace("/", "-") +
-        "_" +
-        mySigInfo.replace("/", "-") +
-        ".adi";
+
+    // Collect all activities for filename
+    let activitiesForFilename = [];
+    if ($("#my-sota-enabled").is(":checked") && $("#my-sota-ref").val()) {
+        activitiesForFilename.push("SOTA-" + $("#my-sota-ref").val().replace(/\//g, "-"));
+    }
+    if ($("#my-pota-enabled").is(":checked") && $("#my-pota-ref").val()) {
+        activitiesForFilename.push("POTA-" + $("#my-pota-ref").val().replace(/\//g, "-"));
+    }
+    if ($("#my-wwff-enabled").is(":checked") && $("#my-wwff-ref").val()) {
+        activitiesForFilename.push("WWFF-" + $("#my-wwff-ref").val().replace(/\//g, "-"));
+    }
+    // Reuse mySig and mySigInfo already declared at top of ADIF function
+    if (mySig && mySigInfo) {
+        activitiesForFilename.push(mySig + "-" + mySigInfo.replace(/\//g, "-"));
+    }
+
+    const activitiesPart = activitiesForFilename.length > 0 ? "_" + activitiesForFilename.join("_") : "";
+    const filename = qsodate + "_" + operator.replace(/\//g, "-") + activitiesPart + ".adi";
+
     download(filename, adif);
 });
 
@@ -657,25 +708,44 @@ $(".js-download-fle").click(function () {
     fleContent += "operator " + operator.toLowerCase() + "\n";
     fleContent += "mycall " + ownCallsign.toLowerCase() + "\n";
 
+    // Export all checked activities
+    if ($("#my-sota-enabled").is(":checked") && $("#my-sota-ref").val()) {
+        fleContent += "mysota " + $("#my-sota-ref").val().toLowerCase() + "\n";
+    }
+    if ($("#my-pota-enabled").is(":checked") && $("#my-pota-ref").val()) {
+        fleContent += "mypota " + $("#my-pota-ref").val().toLowerCase() + "\n";
+    }
+    if ($("#my-wwff-enabled").is(":checked") && $("#my-wwff-ref").val()) {
+        fleContent += "mywwff " + $("#my-wwff-ref").val().toLowerCase() + "\n";
+    }
     if (mySig && mySigInfo) {
-        fleContent += "my" + mySig.toLowerCase() + " " + mySigInfo.toLowerCase() + "\n";
+        fleContent += "mysig " + mySig.toLowerCase() + "\n";
+        fleContent += "mysiginfo " + mySigInfo.toLowerCase() + "\n";
     }
 
     fleContent += "\n# Log\ndate " + qsodate + "\n";
 
-    // Add MY_SIG and MY_SIG_INFO as comments
-    if (mySig) {
-        fleContent += "# MY_SIG " + mySig + "\n";
-    }
-    if (mySigInfo) {
-        fleContent += "# MY_SIG_INFO " + mySigInfo + "\n";
-    }
-
     fleContent += "\n";
     fleContent += textAreaContent;
 
+    // Collect all activities for filename
+    let activitiesForFilename = [];
+    if ($("#my-sota-enabled").is(":checked") && $("#my-sota-ref").val()) {
+        activitiesForFilename.push("SOTA-" + $("#my-sota-ref").val().replace(/\//g, "-"));
+    }
+    if ($("#my-pota-enabled").is(":checked") && $("#my-pota-ref").val()) {
+        activitiesForFilename.push("POTA-" + $("#my-pota-ref").val().replace(/\//g, "-"));
+    }
+    if ($("#my-wwff-enabled").is(":checked") && $("#my-wwff-ref").val()) {
+        activitiesForFilename.push("WWFF-" + $("#my-wwff-ref").val().replace(/\//g, "-"));
+    }
+    if (mySig && mySigInfo) {
+        activitiesForFilename.push(mySig + "-" + mySigInfo.replace(/\//g, "-"));
+    }
+
     // Create filename with date first (yyyy-mm-dd format)
-    const filename = qsodate + "_" + operator.replace("/", "-") + "_" + mySigInfo.replace("/", "-") + ".txt";
+    const activitiesPart = activitiesForFilename.length > 0 ? "_" + activitiesForFilename.join("_") : "";
+    const filename = qsodate + "_" + operator.replace(/\//g, "-") + activitiesPart + ".txt";
 
     download(filename, fleContent);
 });
@@ -685,6 +755,7 @@ $(".js-download-csv").click(function () {
     handleInput();
 
     var myCall = $("#my-call").val().toUpperCase();
+    var mySig = $("#my-sig").val().toUpperCase();
     var mySigInfo = $("#my-sig-ref").val().toUpperCase();
     var operator = $("#operator").val().toUpperCase();
 
@@ -752,6 +823,15 @@ $(".js-download-csv").click(function () {
         const sigInfo = item[8] || '';
         const comment = item[10] || '';
 
+        // Combine all station activities from qsoList
+        let myActivities = [];
+        if (item[11]) myActivities.push(`SOTA:${item[11]}`); // sotaRef
+        if (item[12]) myActivities.push(`POTA:${item[12]}`); // potaRef
+        if (item[13]) myActivities.push(`WWFF:${item[13]}`); // wwffRef
+        if (item[14]) myActivities.push(item[14]); // otherSig (already in "TYPE:REF" format)
+        // Backward compatibility: if no new activities, use old sigInfo
+        const myActivitiesStr = myActivities.length > 0 ? myActivities.join(' / ') : mySigInfo;
+
         // Convert band to MHz if we have a band
         const bandMhz = band ? bandToMhz(band) : freq;
 
@@ -759,7 +839,7 @@ $(".js-download-csv").click(function () {
         const csvLine = [
             'V2',
             escapeCsvField(myCall),
-            escapeCsvField(mySigInfo),
+            escapeCsvField(myActivitiesStr),
             escapeCsvField(date),
             escapeCsvField(time),
             escapeCsvField(bandMhz),
@@ -772,71 +852,40 @@ $(".js-download-csv").click(function () {
         csvContent += csvLine + '\n';
     });
 
+    // Collect all activities for filename
+    let activitiesForFilename = [];
+    if ($("#my-sota-enabled").is(":checked") && $("#my-sota-ref").val()) {
+        activitiesForFilename.push("SOTA-" + $("#my-sota-ref").val().replace(/\//g, "-"));
+    }
+    if ($("#my-pota-enabled").is(":checked") && $("#my-pota-ref").val()) {
+        activitiesForFilename.push("POTA-" + $("#my-pota-ref").val().replace(/\//g, "-"));
+    }
+    if ($("#my-wwff-enabled").is(":checked") && $("#my-wwff-ref").val()) {
+        activitiesForFilename.push("WWFF-" + $("#my-wwff-ref").val().replace(/\//g, "-"));
+    }
+    // Reuse mySig and mySigInfo already declared at top of CSV function
+    if (mySig && mySigInfo) {
+        activitiesForFilename.push(mySig + "-" + mySigInfo.replace(/\//g, "-"));
+    }
+
     // Create filename with date first (yyyy-mm-dd format)
-    const filename = qsodate + "_" + operator.replace("/", "-") + "_" + mySigInfo.replace("/", "-") + ".csv";
+    const activitiesPart = activitiesForFilename.length > 0 ? "_" + activitiesForFilename.join("_") : "";
+    const filename = qsodate + "_" + operator.replace(/\//g, "-") + activitiesPart + ".csv";
 
     download(filename, csvContent);
 });
 
-$(".js-import-fle").click(function () {
-    // Check if there's existing data in the textarea
-    var currentData = $("textarea[name='qso']").val().trim();
-
-    if (currentData) {
-        // Ask user for confirmation to overwrite
-        if (!confirm("You have existing QSO data. Do you want to overwrite it with the imported file?")) {
-            return; // User cancelled, don't proceed
-        }
-    }
-
-    // Trigger the hidden file input
-    $("#fle-file-input").click();
-});
-
-// Handle file selection
-$("#fle-file-input").change(function (event) {
-    const file = event.target.files[0];
-
-    if (!file) {
-        return; // No file selected
-    }
-
-    // Check if it's a text file
-    if (!file.name.endsWith('.txt')) {
-        alert("Please select a valid FLE file (.txt)");
-        // Reset the file input
-        event.target.value = '';
-        return;
-    }
-
-    // Read the file
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-        const content = e.target.result;
-
-        // Parse the FLE file
-        parseFLEFile(content);
-
-        // Reset the file input so the same file can be selected again
-        event.target.value = '';
-    };
-
-    reader.onerror = function () {
-        alert("Error reading file. Please try again.");
-        event.target.value = '';
-    };
-
-    reader.readAsText(file);
-});
 
 function parseFLEFile(content) {
     // Parse FLE file format
     const lines = content.split('\n');
     let operator = '';
     let myCall = '';
-    let mySig = '';
-    let mySigRef = '';
+    let sotaRef = '';
+    let potaRef = '';
+    let wwffRef = '';
+    let otherSig = '';
+    let otherSigRef = '';
     let qsoDate = '';
     let qsoData = [];
     let inLogSection = false;
@@ -855,24 +904,27 @@ function parseFLEFile(content) {
         } else if (line.startsWith('mycall ')) {
             myCall = line.substring(7).trim().toUpperCase();
         } else if (line.startsWith('mysota ')) {
-            mySig = 'SOTA';
-            mySigRef = line.substring(7).trim().toUpperCase();
+            sotaRef = line.substring(7).trim().toUpperCase();
         } else if (line.startsWith('mypota ')) {
-            mySig = 'POTA';
-            mySigRef = line.substring(7).trim().toUpperCase();
+            potaRef = line.substring(7).trim().toUpperCase();
         } else if (line.startsWith('mywwff ')) {
-            mySig = 'WWFF';
-            mySigRef = line.substring(7).trim().toUpperCase();
+            wwffRef = line.substring(7).trim().toUpperCase();
+        } else if (line.startsWith('mysig ')) {
+            otherSig = line.substring(6).trim().toUpperCase();
+        } else if (line.startsWith('mysiginfo ')) {
+            otherSigRef = line.substring(10).trim().toUpperCase();
         } else if (line.startsWith('mywota ')) {
-            mySig = 'WOTA';
-            mySigRef = line.substring(7).trim().toUpperCase();
+            // For backward compatibility, WOTA goes to "other" activity
+            otherSig = 'WOTA';
+            otherSigRef = line.substring(7).trim().toUpperCase();
         } else if (line.startsWith('date ')) {
             qsoDate = line.substring(5).trim();
             inLogSection = true;
         } else if (line.startsWith('# MY_SIG ')) {
-            mySig = line.substring(9).trim().toUpperCase();
+            // Legacy comment format - ignore if we already have activities
+            if (!otherSig) otherSig = line.substring(9).trim().toUpperCase();
         } else if (line.startsWith('# MY_SIG_INFO ')) {
-            mySigRef = line.substring(14).trim().toUpperCase();
+            if (!otherSigRef) otherSigRef = line.substring(14).trim().toUpperCase();
         } else if (inLogSection) {
             // This is QSO data - add it to the array (skip comments)
             if (line && !line.startsWith('#')) {
@@ -888,12 +940,27 @@ function parseFLEFile(content) {
     if (myCall) {
         $("#my-call").val(myCall);
     }
-    if (mySig) {
-        $("#my-sig").val(mySig);
+
+    // Update activity checkboxes and references
+    if (sotaRef) {
+        $("#my-sota-enabled").prop("checked", true);
+        $("#my-sota-ref").prop("disabled", false).val(sotaRef);
     }
-    if (mySigRef) {
-        $("#my-sig-ref").val(mySigRef);
+    if (potaRef) {
+        $("#my-pota-enabled").prop("checked", true);
+        $("#my-pota-ref").prop("disabled", false).val(potaRef);
     }
+    if (wwffRef) {
+        $("#my-wwff-enabled").prop("checked", true);
+        $("#my-wwff-ref").prop("disabled", false).val(wwffRef);
+    }
+    if (otherSig) {
+        $("#my-sig").val(otherSig);
+        if (otherSigRef) {
+            $("#my-sig-ref").prop("disabled", false).val(otherSigRef);
+        }
+    }
+
     if (qsoDate) {
         $("#qsodate").val(qsoDate);
     }
@@ -1107,6 +1174,15 @@ $(document).ready(function () {
     var myPower = localStorage.getItem("my-power");
     var myGrid = localStorage.getItem("my-grid");
 
+    // Load new activity fields
+    var mysig = localStorage.getItem("my-sig");
+    var sotaEnabled = localStorage.getItem("my-sota-enabled") === "true";
+    var sotaRef = localStorage.getItem("my-sota-ref");
+    var potaEnabled = localStorage.getItem("my-pota-enabled") === "true";
+    var potaRef = localStorage.getItem("my-pota-ref");
+    var wwffEnabled = localStorage.getItem("my-wwff-enabled") === "true";
+    var wwffRef = localStorage.getItem("my-wwff-ref");
+
     if (mycall != null) {
         $("#my-call").val(mycall);
     }
@@ -1117,6 +1193,34 @@ $(document).ready(function () {
 
     if (mysotawwff != null) {
         $("#my-sig-ref").val(mysotawwff);
+    }
+
+    if (mysig != null) {
+        $("#my-sig").val(mysig);
+    }
+
+    // Restore checkbox states and reference values
+    if (sotaEnabled) {
+        $("#my-sota-enabled").prop("checked", true);
+        $("#my-sota-ref").prop("disabled", false);
+        if (sotaRef) $("#my-sota-ref").val(sotaRef);
+    }
+
+    if (potaEnabled) {
+        $("#my-pota-enabled").prop("checked", true);
+        $("#my-pota-ref").prop("disabled", false);
+        if (potaRef) $("#my-pota-ref").val(potaRef);
+    }
+
+    if (wwffEnabled) {
+        $("#my-wwff-enabled").prop("checked", true);
+        $("#my-wwff-ref").prop("disabled", false);
+        if (wwffRef) $("#my-wwff-ref").val(wwffRef);
+    }
+
+    // Enable "other" activity ref field if sig is selected
+    if (mysig && mysig !== "") {
+        $("#my-sig-ref").prop("disabled", false);
     }
 
     if (qsoarea != null) {
@@ -1148,6 +1252,122 @@ $(document).ready(function () {
     loadPowerSettings();
     loadMyGridSettings();
 
+    // Setup activity checkbox event listeners
+    $("#my-sota-enabled").change(function() {
+        if ($(this).is(":checked")) {
+            $("#my-sota-ref").prop("disabled", false).focus();
+        } else {
+            $("#my-sota-ref").prop("disabled", true).val("");
+        }
+    });
+
+    $("#my-pota-enabled").change(function() {
+        if ($(this).is(":checked")) {
+            $("#my-pota-ref").prop("disabled", false).focus();
+        } else {
+            $("#my-pota-ref").prop("disabled", true).val("");
+        }
+    });
+
+    $("#my-wwff-enabled").change(function() {
+        if ($(this).is(":checked")) {
+            $("#my-wwff-ref").prop("disabled", false).focus();
+        } else {
+            $("#my-wwff-ref").prop("disabled", true).val("");
+        }
+    });
+
+    // Setup "other" activity dropdown event listener
+    $("#my-sig").on("input change", function() {
+        if ($(this).val().trim() !== "") {
+            $("#my-sig-ref").prop("disabled", false);
+        } else {
+            $("#my-sig-ref").prop("disabled", true).val("");
+        }
+    });
+
+    // Resizable splitter functionality
+    const splitter = document.getElementById('vertical-splitter');
+    const formPanel = document.getElementById('form-panel');
+    const container = document.querySelector('.resizable-container');
+
+    if (splitter && formPanel && container) {
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+
+        splitter.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = formPanel.offsetWidth;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+
+            const deltaX = e.clientX - startX;
+            const newWidth = startWidth + deltaX;
+            const containerWidth = container.offsetWidth;
+            const minWidth = 300;
+            const maxWidth = containerWidth * 0.7;
+
+            if (newWidth >= minWidth && newWidth <= maxWidth) {
+                const percentage = (newWidth / containerWidth) * 100;
+                formPanel.style.flex = `0 0 ${percentage}%`;
+                // Trigger table height sync after resize
+                debouncedSyncTableHeight();
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                // Save the width to localStorage
+                const width = formPanel.offsetWidth;
+                localStorage.setItem('form-panel-width', width);
+            }
+        });
+
+        // Restore saved width on page load
+        const savedWidth = localStorage.getItem('form-panel-width');
+        if (savedWidth && container.offsetWidth > 0) {
+            const percentage = (parseInt(savedWidth) / container.offsetWidth) * 100;
+            formPanel.style.flex = `0 0 ${percentage}%`;
+        }
+    }
+
+    // Font size controls for textarea
+    let currentFontSize = 16; // Default font size in pixels
+    const $textarea = $(".qso-area");
+
+    // Load saved font size
+    const savedFontSize = localStorage.getItem('textarea-font-size');
+    if (savedFontSize) {
+        currentFontSize = parseInt(savedFontSize);
+        $textarea.css('font-size', currentFontSize + 'px');
+    }
+
+    $(".js-increase-font").click(function() {
+        if (currentFontSize < 32) {
+            currentFontSize += 2;
+            $textarea.css('font-size', currentFontSize + 'px');
+            localStorage.setItem('textarea-font-size', currentFontSize);
+        }
+    });
+
+    $(".js-decrease-font").click(function() {
+        if (currentFontSize > 10) {
+            currentFontSize -= 2;
+            $textarea.css('font-size', currentFontSize + 'px');
+            localStorage.setItem('textarea-font-size', currentFontSize);
+        }
+    });
+
     // Initial sync of table height
     syncTableHeight();
 
@@ -1168,6 +1388,59 @@ $(document).ready(function () {
         // Initialize the last height
         textarea._lastHeight = textarea.offsetHeight;
     }
+
+    // Import FLE button handler
+    $(".js-import-fle").click(function () {
+        // Check if there's existing data in the textarea
+        var currentData = $("textarea[name='qso']").val().trim();
+
+        if (currentData) {
+            // Ask user for confirmation to overwrite
+            if (!confirm("You have existing QSO data. Do you want to overwrite it with the imported file?")) {
+                return; // User cancelled, don't proceed
+            }
+        }
+
+        // Trigger the hidden file input
+        $("#fle-file-input").click();
+    });
+
+    // Handle file selection
+    $("#fle-file-input").change(function (event) {
+        const file = event.target.files[0];
+
+        if (!file) {
+            return; // No file selected
+        }
+
+        // Check if it's a text file
+        if (!file.name.endsWith('.txt')) {
+            alert("Please select a valid FLE file (.txt)");
+            // Reset the file input
+            event.target.value = '';
+            return;
+        }
+
+        // Read the file
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const content = e.target.result;
+
+            // Parse the FLE file
+            parseFLEFile(content);
+
+            // Reset the file input so the same file can be selected again
+            event.target.value = '';
+        };
+
+        reader.onerror = function () {
+            alert("Error reading file. Please try again.");
+            event.target.value = '';
+        };
+
+        reader.readAsText(file);
+    });
 });
 
 // Sync table height to match textarea + buttons
