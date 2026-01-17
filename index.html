@@ -164,7 +164,7 @@
                         </div>
                         <div class="row">
                             <div class="col-xs-12">
-                                <p class="text-muted" style="font-size: 0.9em; margin-top: -10px;">
+                                <p class="text-muted" style="font-size: 0.9em; margin-top: 5px;">
                                     <i class="fa fa-info-circle"></i> Check all activities you're activating simultaneously. Reference fields are required when checked.
                                 </p>
                             </div>
@@ -199,38 +199,21 @@
 								<span class="js-power text-muted"></span><span class="js-my-grid text-muted"></span>
 							</div>
 						</div>
-						<div class="row mt-2 g-2">
-							<div class="col-6">
-								<button class="btn btn-primary js-reload-qso w-100">Reload QSO list</button>
-							</div>
-							<div class="col-6">
-								<button class="btn btn-warning js-download-adif w-100">Download ADIF</button>
-							</div>
-							<div class="col-6">
-								<button class="btn btn-warning js-download-fle w-100">Download FLE</button>
-							</div>
-							<div class="col-6">
-								<button class="btn btn-warning js-download-csv w-100">Download CSV</button>
-							</div>
-							<div class="col-6">
-								<button class="btn btn-info js-import-fle w-100">Import FLE</button>
-								<input type="file" id="fle-file-input" accept=".txt" style="display: none;">
-							</div>
-							<div class="col-6">
-								<button class="btn btn-danger js-empty-qso w-100">Clear logging session</button>
-							</div>
-							<div class="col-12">
-								<button class="btn btn-secondary js-load-sample-log w-100">Load sample log</button>
-							</div>
-						</div>
 					</div>
 					<div class="resizable-splitter" id="vertical-splitter"></div>
 					<div class="resizable-panel" id="table-panel">
-						<label for="qso-list">QSO list</label>
+						<div class="d-flex justify-content-between align-items-center mb-1">
+							<label for="qso-list" class="mb-0">QSO list</label>
+							<div class="font-size-controls">
+								<button type="button" class="btn btn-sm btn-outline-secondary js-table-decrease-font" title="Decrease font size">−</button>
+								<button type="button" class="btn btn-sm btn-outline-secondary js-table-increase-font" title="Increase font size">+</button>
+							</div>
+						</div>
 						<div id="qso-list" class="qsoList">
 							<table class="table table-condensed table-striped table-sm" id="qsoTable">
 								<thead>
 									<tr>
+										<th>#</th>
 										<th>Date</th>
 										<th>Time</th>
 										<th>Callsign</th>
@@ -239,8 +222,8 @@
 										<th>RSTs</th>
 										<th>RSTr</th>
 										<th>Op.</th>
-                                        <th>Sig</th>
-                                        <th>Comment</th>
+										<th>Sig</th>
+										<th>Comment</th>
 									</tr>
 								</thead>
 								<tbody id="qsoTableBody">
@@ -249,6 +232,30 @@
 							</table>
 						</div>
 						<span class="js-qso-count"></span>
+					</div>
+				</div>
+				<div class="row mt-4 g-2">
+					<div class="col-6 col-lg">
+						<button class="btn btn-sm btn-primary js-reload-qso w-100">Reload QSO list</button>
+					</div>
+					<div class="col-6 col-lg">
+						<button class="btn btn-sm btn-warning js-download-adif w-100">Download ADIF</button>
+					</div>
+					<div class="col-6 col-lg">
+						<button class="btn btn-sm btn-warning js-download-fle w-100">Download FLE</button>
+					</div>
+					<div class="col-6 col-lg">
+						<button class="btn btn-sm btn-warning js-download-csv w-100">Download CSV</button>
+					</div>
+					<div class="col-6 col-lg">
+						<button class="btn btn-sm btn-info js-import-fle w-100">Import FLE</button>
+						<input type="file" id="fle-file-input" accept=".txt" style="display: none;">
+					</div>
+					<div class="col-6 col-lg">
+						<button class="btn btn-sm btn-danger js-empty-qso w-100">Clear logging session</button>
+					</div>
+					<div class="col-12 col-lg">
+						<button class="btn btn-sm btn-secondary js-load-sample-log w-100">Load sample log</button>
 					</div>
 				</div>
 				<div class="row mt-4">

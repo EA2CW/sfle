@@ -281,7 +281,9 @@ function handleInput() {
                 sigInfoCell += `<div class="cell-meta">${sig}</div>`;
             }
 
+            const qsoNumber = String(qsoList.length).padStart(3, '0');
             const tableRow = $(`<tr>
+        <td>${qsoNumber}</td>
         <td>${extraQsoDate}</td>
         <td>${qsotime}</td>
         <td class="cell-stacked">${callsignCell}</td>
@@ -296,7 +298,7 @@ function handleInput() {
 
             $("#qsoTable > tbody:last-child").append(tableRow);
 
-            localStorage.setItem("tabledata", $("#qsoTable").html());
+            localStorage.setItem("tabledata", $("#qsoTable tbody").html());
             localStorage.setItem("my-call", $("#my-call").val());
             localStorage.setItem("operator", $("#operator").val());
             localStorage.setItem("my-sig", $("#my-sig").val());
@@ -1245,7 +1247,7 @@ $(document).ready(function () {
     }
 
     if (tabledata != null) {
-        $("#qsoTable").html(tabledata);
+        $("#qsoTable tbody").html(tabledata);
         handleInput();
     }
 
@@ -1367,6 +1369,100 @@ $(document).ready(function () {
             localStorage.setItem('textarea-font-size', currentFontSize);
         }
     });
+
+    // Table font size controls
+    var tableFontSize = parseInt(localStorage.getItem('table-font-size')) || 14;
+    var $qsoTable = $("#qsoTable");
+    $qsoTable.css('font-size', tableFontSize + 'px');
+
+    $(".js-table-increase-font").click(function() {
+        if (tableFontSize < 24) {
+            tableFontSize += 2;
+            $qsoTable.css('font-size', tableFontSize + 'px');
+            localStorage.setItem('table-font-size', tableFontSize);
+        }
+    });
+
+    $(".js-table-decrease-font").click(function() {
+        if (tableFontSize > 8) {
+            tableFontSize -= 2;
+            $qsoTable.css('font-size', tableFontSize + 'px');
+            localStorage.setItem('table-font-size', tableFontSize);
+        }
+    });
+
+    // Column resizing
+    function initColumnResizers() {
+        const table = document.getElementById('qsoTable');
+        if (!table) return;
+
+        const headerCells = table.querySelectorAll('thead th');
+
+        headerCells.forEach((th, index) => {
+            // Remove existing resizer if any
+            const existingResizer = th.querySelector('.col-resizer');
+            if (existingResizer) existingResizer.remove();
+
+            // Don't add resizer to last column
+            if (index === headerCells.length - 1) return;
+
+            const resizer = document.createElement('div');
+            resizer.className = 'col-resizer';
+            th.appendChild(resizer);
+
+            let startX, startWidth, nextStartWidth;
+            const nextTh = headerCells[index + 1];
+
+            resizer.addEventListener('mousedown', function(e) {
+                startX = e.pageX;
+                startWidth = th.offsetWidth;
+                nextStartWidth = nextTh ? nextTh.offsetWidth : 0;
+                resizer.classList.add('resizing');
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                e.preventDefault();
+            });
+
+            function onMouseMove(e) {
+                const diff = e.pageX - startX;
+                const newWidth = startWidth + diff;
+                const newNextWidth = nextStartWidth - diff;
+
+                if (newWidth > 30 && newNextWidth > 30) {
+                    th.style.width = newWidth + 'px';
+                    if (nextTh) nextTh.style.width = newNextWidth + 'px';
+
+                    // Apply to corresponding tbody cells
+                    const rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells[index]) cells[index].style.width = newWidth + 'px';
+                        if (cells[index + 1]) cells[index + 1].style.width = newNextWidth + 'px';
+                    });
+                }
+            }
+
+            function onMouseUp() {
+                resizer.classList.remove('resizing');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+        });
+    }
+
+    // Initialize column resizers
+    initColumnResizers();
+
+    // Re-initialize when table content changes
+    const tableObserver = new MutationObserver(function() {
+        initColumnResizers();
+    });
+
+    const qsoTableEl = document.getElementById('qsoTable');
+    if (qsoTableEl) {
+        tableObserver.observe(qsoTableEl.querySelector('thead'), { childList: true, subtree: true });
+    }
 
     // Initial sync of table height
     syncTableHeight();

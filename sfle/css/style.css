@@ -56,16 +56,43 @@ tbody tr {
 }
 
 /* Column widths optimized for data */
-thead th:nth-child(1), tbody td:nth-child(1) { width: 9%; } /* Date */
-thead th:nth-child(2), tbody td:nth-child(2) { width: 5%; } /* Time */
-thead th:nth-child(3), tbody td:nth-child(3) { width: 13%; } /* Callsign */
-thead th:nth-child(4), tbody td:nth-child(4) { width: 5%; } /* Band */
-thead th:nth-child(5), tbody td:nth-child(5) { width: 5%; } /* Mode */
-thead th:nth-child(6), tbody td:nth-child(6) { width: 5%; } /* RS */
-thead th:nth-child(7), tbody td:nth-child(7) { width: 5%; } /* RR */
-thead th:nth-child(8), tbody td:nth-child(8) { width: 10%; } /* Op. */
-thead th:nth-child(9), tbody td:nth-child(9) { width: 18%; } /* Sig Info */
-thead th:nth-child(10), tbody td:nth-child(10) { width: 25%; } /* Comment */
+thead th:nth-child(1), tbody td:nth-child(1) { width: 4%; } /* # */
+thead th:nth-child(2), tbody td:nth-child(2) { width: 9%; } /* Date */
+thead th:nth-child(3), tbody td:nth-child(3) { width: 5%; } /* Time */
+thead th:nth-child(4), tbody td:nth-child(4) { width: 12%; } /* Callsign */
+thead th:nth-child(5), tbody td:nth-child(5) { width: 5%; } /* Band */
+thead th:nth-child(6), tbody td:nth-child(6) { width: 5%; } /* Mode */
+thead th:nth-child(7), tbody td:nth-child(7) { width: 5%; } /* RS */
+thead th:nth-child(8), tbody td:nth-child(8) { width: 5%; } /* RR */
+thead th:nth-child(9), tbody td:nth-child(9) { width: 8%; } /* Op. */
+thead th:nth-child(10), tbody td:nth-child(10) { width: 17%; } /* Sig Info */
+thead th:nth-child(11), tbody td:nth-child(11) { width: 25%; } /* Comment */
+
+/* Resizable columns */
+thead th {
+  position: relative;
+  user-select: none;
+}
+
+thead th .col-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+thead th .col-resizer:hover,
+thead th .col-resizer.resizing {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] thead th .col-resizer:hover,
+[data-bs-theme="dark"] thead th .col-resizer.resizing {
+  background: rgba(255, 255, 255, 0.3);
+}
 
 tbody {
   overflow-y: scroll;
@@ -240,6 +267,8 @@ li.nav-item {
   padding: 2px 8px;
   line-height: 1.2;
   min-width: 28px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 
