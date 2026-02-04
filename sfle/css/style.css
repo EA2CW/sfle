@@ -52,7 +52,7 @@ thead,
 tbody tr {
   width: 100%;
   table-layout: fixed;
-  display: inline-table;
+  display: table;
 }
 
 /* Column widths optimized for data */
@@ -95,7 +95,7 @@ thead th .col-resizer.resizing {
 }
 
 tbody {
-  overflow-y: scroll;
+  overflow-y: inherit;
   max-height: 380px;
   position: absolute;
   width: 100%;
@@ -148,6 +148,18 @@ tbody tr:nth-child(odd) {
   color: #dee2e6;
 }
 
+tbody tr {
+  cursor: pointer;
+}
+
+tbody tr.row-selected {
+  background-color: #cce5ff !important;
+}
+
+[data-bs-theme="dark"] tbody tr.row-selected {
+  background-color: #264f78 !important;
+}
+
 [data-bs-theme="dark"] .cell-meta {
   color: #5cb85c;
 }
@@ -195,14 +207,17 @@ li.nav-item {
 .resizable-container {
   display: flex;
   width: 100%;
-  height: calc(100vh - 300px); /* Adjust based on header/footer height */
   min-height: 500px;
   position: relative;
 }
 
 .resizable-panel {
-  overflow: auto;
+  overflow: visible;
   padding: 0 15px;
+}
+
+#table-panel.resizable-panel {
+  overflow: auto;
 }
 
 #form-panel {

@@ -384,9 +384,22 @@ $(".js-empty-qso").click(function () {
         localStorage.removeItem("qso-area");
         localStorage.removeItem("qsodate");
         localStorage.removeItem("my-grid");
+        localStorage.removeItem("my-sota-enabled");
+        localStorage.removeItem("my-sota-ref");
+        localStorage.removeItem("my-pota-enabled");
+        localStorage.removeItem("my-pota-ref");
+        localStorage.removeItem("my-wwff-enabled");
+        localStorage.removeItem("my-wwff-ref");
         $("#qsodate").val("");
         $("#qsoTable tbody").empty();
-        $("#my-sig-ref").val("");
+        $("#my-sig").val("");
+        $("#my-sig-ref").prop("disabled", true).val("");
+        $("#my-sota-enabled").prop("checked", false);
+        $("#my-sota-ref").prop("disabled", true).val("");
+        $("#my-pota-enabled").prop("checked", false);
+        $("#my-pota-ref").prop("disabled", true).val("");
+        $("#my-wwff-enabled").prop("checked", false);
+        $("#my-wwff-ref").prop("disabled", true).val("");
         $(".qso-area").val("");
         $("#my-grid").val("");
         qsoList = [];
@@ -630,6 +643,9 @@ Internet: https://sfle.ok2cqr.com
         } else if (isWwffInfo(sigInfo)) {
             qso = qso + getAdifTag("SIG", "WWFF");
             qso = qso + getAdifTag("SIG_INFO", sigInfo);
+        } else if (isBotaInfo(sigInfo)) {
+            qso = qso + getAdifTag("SIG", "BOTA");
+            qso = qso + getAdifTag("SIG_INFO", sigInfo);
         } else if (isPotaInfo(sigInfo)) {
             qso = qso + getAdifTag("SIG", "POTA");
             qso = qso + getAdifTag("SIG_INFO", sigInfo);
@@ -643,7 +659,12 @@ Internet: https://sfle.ok2cqr.com
         }
 
         if (myGrid) {
-            qso = qso + getAdifTag("MY_GRIDSQUARE", myGrid);
+            if (myGrid.length > 8) {
+                qso = qso + getAdifTag("MY_GRIDSQUARE", myGrid.substring(0, 8));
+                qso = qso + getAdifTag("MY_GRIDSQUARE_EXT", myGrid.substring(8));
+            } else {
+                qso = qso + getAdifTag("MY_GRIDSQUARE", myGrid);
+            }
         }
 
         let gridLocator = item[9];
@@ -1042,10 +1063,25 @@ function isPotaInfo(str) {
     return items.length > 0 && items.every(item => potaPattern.test(item));
 }
 
+function isBotaInfo(str) {
+    // Return false for empty or null/undefined strings
+    if (!str || typeof str !== 'string') {
+        return false;
+    }
+
+    // BOTA reference pattern: BG-NNNN (case-insensitive)
+    const botaPattern = /^BG-\d{4}$/i;
+
+    return botaPattern.test(str.replace(/\s+/g, ''));
+}
+
 function getSigFromSigInfo(sigInfo) {
     // Check WWFF first since it has a more specific pattern (requires "FF")
     if (isWwffInfo(sigInfo)) {
         return "WWFF";
+    // Check BOTA before POTA since BG-NNNN would match POTA pattern
+    } else if (isBotaInfo(sigInfo)) {
+        return "BOTA";
     } else if (isPotaInfo(sigInfo)) {
         return "POTA";
     } else if (isWotaInfo(sigInfo)) {
@@ -1070,7 +1106,7 @@ function isWotaInfo(str) {
 }
 
 function isSigInfo(str) {
-    return isSotaInfo(str) || isPotaInfo(str) || isWotaInfo(str) || isWwffInfo(str);
+    return isSotaInfo(str) || isBotaInfo(str) || isPotaInfo(str) || isWotaInfo(str) || isWwffInfo(str);
 }
 
 // Validate Maidenhead locator format (#IO84NJ)
@@ -1484,6 +1520,11 @@ $(document).ready(function () {
         // Initialize the last height
         textarea._lastHeight = textarea.offsetHeight;
     }
+
+    // Row click highlight
+    $("#qsoTable tbody").on("click", "tr", function () {
+        $(this).toggleClass("row-selected").siblings().removeClass("row-selected");
+    });
 
     // Import FLE button handler
     $(".js-import-fle").click(function () {
