@@ -1082,8 +1082,8 @@ function isBotaInfo(str) {
         return false;
     }
 
-    // BOTA reference pattern: BG-NNNN (case-insensitive)
-    const botaPattern = /^BG-\d{4}$/i;
+    // BOTA reference pattern: B/CC-NNNN e.g. B/G-1234 (case-insensitive)
+    const botaPattern = /^B\/[A-Z]{1,2}-\d{4}$/i;
 
     return botaPattern.test(str.replace(/\s+/g, ''));
 }
