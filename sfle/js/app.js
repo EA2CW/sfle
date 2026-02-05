@@ -198,6 +198,10 @@ function handleInput() {
                 gridLocator = item.substring(1).toUpperCase();
             } else if (isSigInfo(item)) {
                 sigInfo = item.toUpperCase();
+                // Normalize POTA refs to remove spaces around commas
+                if (isPotaInfo(sigInfo)) {
+                    sigInfo = normalizePotaRefs(sigInfo);
+                }
                 sig = getSigFromSigInfo(sigInfo);
             } else if (
                 item.match(
@@ -246,7 +250,7 @@ function handleInput() {
 
             // Collect all activity data from form fields
             var sotaRef = $("#my-sota-enabled").is(":checked") ? $("#my-sota-ref").val() : "";
-            var potaRef = $("#my-pota-enabled").is(":checked") ? $("#my-pota-ref").val() : "";
+            var potaRef = $("#my-pota-enabled").is(":checked") ? normalizePotaRefs($("#my-pota-ref").val()) : "";
             var wwffRef = $("#my-wwff-enabled").is(":checked") ? $("#my-wwff-ref").val() : "";
             var otherSig = $("#my-sig").val() ? $("#my-sig").val() + ":" + $("#my-sig-ref").val() : "";
 
@@ -929,7 +933,7 @@ function parseFLEFile(content) {
         } else if (line.startsWith('mysota ')) {
             sotaRef = line.substring(7).trim().toUpperCase();
         } else if (line.startsWith('mypota ')) {
-            potaRef = line.substring(7).trim().toUpperCase();
+            potaRef = normalizePotaRefs(line.substring(7).trim());
         } else if (line.startsWith('mywwff ')) {
             wwffRef = line.substring(7).trim().toUpperCase();
         } else if (line.startsWith('mysig ')) {
@@ -1061,6 +1065,15 @@ function isPotaInfo(str) {
 
     // Check if at least one item exists and all items match the pattern
     return items.length > 0 && items.every(item => potaPattern.test(item));
+}
+
+function normalizePotaRefs(str) {
+    // Normalize POTA references: remove spaces around commas for consistent ADIF format
+    if (!str || typeof str !== 'string') {
+        return '';
+    }
+    // Remove spaces around commas and return uppercase
+    return str.replace(/\s*,\s*/g, ',').toUpperCase();
 }
 
 function isBotaInfo(str) {
