@@ -115,7 +115,8 @@
                                             <input type="checkbox" id="my-sota-enabled"> SOTA
                                         </label>
                                     </div>
-                                    <input type="text" class="form-control text-uppercase" id="my-sota-ref" placeholder="e.g. OK/PL-001" disabled>
+									<label for="my-sota-ref"></label>
+									<input type="text" class="form-control text-uppercase" id="my-sota-ref" placeholder="e.g. OK/PL-001" disabled>
                                 </div>
                             </div>
                             <div class="col-xs-12 col-lg-4">
@@ -124,8 +125,12 @@
                                         <label>
                                             <input type="checkbox" id="my-pota-enabled"> POTA
                                         </label>
+                                        <label class="ml-3" id="pota-compat-label" style="display:none;">
+                                            <input type="checkbox" id="my-pota-compat"> <span data-toggle="tooltip" data-placement="top" title="Generate a pota.app compatible file">Compatible</span>
+                                        </label>
                                     </div>
-                                    <input type="text" class="form-control text-uppercase" id="my-pota-ref" placeholder="e.g. K-1234 or K-1234, K-5678" disabled>
+									<label for="my-pota-ref"></label>
+									<input type="text" class="form-control text-uppercase" id="my-pota-ref" placeholder="e.g. K-1234 or K-1234, K-5678" disabled>
                                 </div>
                             </div>
                             <div class="col-xs-12 col-lg-4">
@@ -135,7 +140,8 @@
                                             <input type="checkbox" id="my-wwff-enabled"> WWFF
                                         </label>
                                     </div>
-                                    <input type="text" class="form-control text-uppercase" id="my-wwff-ref" placeholder="e.g. OKFF-2068" disabled>
+									<label for="my-wwff-ref"></label>
+									<input type="text" class="form-control text-uppercase" id="my-wwff-ref" placeholder="e.g. OKFF-2068" disabled>
                                 </div>
                             </div>
                         </div>

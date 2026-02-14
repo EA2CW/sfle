@@ -57,7 +57,7 @@ tbody tr {
 
 /* Column widths optimized for data */
 thead th:nth-child(1), tbody td:nth-child(1) { width: 4%; } /* # */
-thead th:nth-child(2), tbody td:nth-child(2) { width: 9%; } /* Date */
+thead th:nth-child(2), tbody td:nth-child(2) { width: 9%; white-space: nowrap; } /* Date */
 thead th:nth-child(3), tbody td:nth-child(3) { width: 5%; } /* Time */
 thead th:nth-child(4), tbody td:nth-child(4) { width: 12%; } /* Callsign */
 thead th:nth-child(5), tbody td:nth-child(5) { width: 5%; } /* Band */

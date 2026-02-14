@@ -147,6 +147,11 @@ function handleInput() {
     var text = $textarea.val().trim();
     lines = text.split("\n");
     lines.forEach((row) => {
+        // Skip comment lines (lines starting with #)
+        if (row.trim().startsWith('#')) {
+            return;
+        }
+
         var rst_s = null;
         var rst_r = null;
         var comment = "";
@@ -316,6 +321,7 @@ function handleInput() {
             localStorage.setItem("my-sota-ref", $("#my-sota-ref").val());
             localStorage.setItem("my-pota-enabled", $("#my-pota-enabled").is(":checked"));
             localStorage.setItem("my-pota-ref", $("#my-pota-ref").val());
+            localStorage.setItem("my-pota-compat", $("#my-pota-compat").is(":checked"));
             localStorage.setItem("my-wwff-enabled", $("#my-wwff-enabled").is(":checked"));
             localStorage.setItem("my-wwff-ref", $("#my-wwff-ref").val());
 
@@ -392,6 +398,7 @@ $(".js-empty-qso").click(function () {
         localStorage.removeItem("my-sota-ref");
         localStorage.removeItem("my-pota-enabled");
         localStorage.removeItem("my-pota-ref");
+        localStorage.removeItem("my-pota-compat");
         localStorage.removeItem("my-wwff-enabled");
         localStorage.removeItem("my-wwff-ref");
         $("#qsodate").val("");
@@ -402,6 +409,8 @@ $(".js-empty-qso").click(function () {
         $("#my-sota-ref").prop("disabled", true).val("");
         $("#my-pota-enabled").prop("checked", false);
         $("#my-pota-ref").prop("disabled", true).val("");
+        $("#my-pota-compat").prop("checked", false);
+        $("#pota-compat-label").hide();
         $("#my-wwff-enabled").prop("checked", false);
         $("#my-wwff-ref").prop("disabled", true).val("");
         $(".qso-area").val("");
@@ -615,7 +624,12 @@ Internet: https://sfle.ok2cqr.com
             qso = qso + getAdifTag("MY_SOTA_REF", item[11]);
         }
         if (item[12]) { // potaRef
-            qso = qso + getAdifTag("MY_POTA_REF", item[12]);
+            if ($("#my-pota-compat").is(":checked")) {
+                qso = qso + getAdifTag("MY_SIG", "POTA");
+                qso = qso + getAdifTag("MY_SIG_INFO", item[12]);
+            } else {
+                qso = qso + getAdifTag("MY_POTA_REF", item[12]);
+            }
         }
         if (item[13]) { // wwffRef
             qso = qso + getAdifTag("MY_WWFF_REF", item[13]);
@@ -632,7 +646,12 @@ Internet: https://sfle.ok2cqr.com
             if (mySig === 'SOTA') {
                 qso = qso + getAdifTag("MY_SOTA_REF", mySigInfo);
             } else if (mySig === 'POTA') {
-                qso = qso + getAdifTag("MY_POTA_REF", mySigInfo);
+                if ($("#my-pota-compat").is(":checked")) {
+                    qso = qso + getAdifTag("MY_SIG", "POTA");
+                    qso = qso + getAdifTag("MY_SIG_INFO", mySigInfo);
+                } else {
+                    qso = qso + getAdifTag("MY_POTA_REF", mySigInfo);
+                }
             } else if (mySig === 'WWFF') {
                 qso = qso + getAdifTag("MY_WWFF_REF", mySigInfo);
             } else if (mySig) {
@@ -953,8 +972,8 @@ function parseFLEFile(content) {
         } else if (line.startsWith('# MY_SIG_INFO ')) {
             if (!otherSigRef) otherSigRef = line.substring(14).trim().toUpperCase();
         } else if (inLogSection) {
-            // This is QSO data - add it to the array (skip comments)
-            if (line && !line.startsWith('#')) {
+            // This is QSO data - add it to the array (preserve # comment lines)
+            if (line) {
                 qsoData.push(line);
             }
         }
@@ -976,6 +995,7 @@ function parseFLEFile(content) {
     if (potaRef) {
         $("#my-pota-enabled").prop("checked", true);
         $("#my-pota-ref").prop("disabled", false).val(potaRef);
+        $("#pota-compat-label").show();
     }
     if (wwffRef) {
         $("#my-wwff-enabled").prop("checked", true);
@@ -1231,6 +1251,7 @@ $(document).ready(function () {
     var sotaRef = localStorage.getItem("my-sota-ref");
     var potaEnabled = localStorage.getItem("my-pota-enabled") === "true";
     var potaRef = localStorage.getItem("my-pota-ref");
+    var potaCompat = localStorage.getItem("my-pota-compat") === "true";
     var wwffEnabled = localStorage.getItem("my-wwff-enabled") === "true";
     var wwffRef = localStorage.getItem("my-wwff-ref");
 
@@ -1260,7 +1281,9 @@ $(document).ready(function () {
     if (potaEnabled) {
         $("#my-pota-enabled").prop("checked", true);
         $("#my-pota-ref").prop("disabled", false);
+        $("#pota-compat-label").show();
         if (potaRef) $("#my-pota-ref").val(potaRef);
+        if (potaCompat) $("#my-pota-compat").prop("checked", true);
     }
 
     if (wwffEnabled) {
@@ -1315,8 +1338,11 @@ $(document).ready(function () {
     $("#my-pota-enabled").change(function() {
         if ($(this).is(":checked")) {
             $("#my-pota-ref").prop("disabled", false).focus();
+            $("#pota-compat-label").show();
         } else {
             $("#my-pota-ref").prop("disabled", true).val("");
+            $("#my-pota-compat").prop("checked", false);
+            $("#pota-compat-label").hide();
         }
     });
 
