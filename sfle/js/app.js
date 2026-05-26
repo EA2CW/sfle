@@ -281,13 +281,10 @@ function handleInput() {
                 operatorName,   // [15]
             ]);
 
-            // Build callsign cell with optional grid locator and operator name underneath
+            // Build callsign cell with optional grid locator underneath
             let callsignCell = `<div class="cell-primary"><a href="https://qrz.com/db/${callsign}" target="_blank" rel="noopener noreferrer">${callsign}</a></div>`;
             if (gridLocator) {
                 callsignCell += `<div class="cell-meta">${gridLocator}</div>`;
-            }
-            if (operatorName) {
-                callsignCell += `<div class="cell-meta">${operatorName}</div>`;
             }
 
             // Build sigInfo cell for the OTHER station's activity (not MY_* fields)
@@ -307,6 +304,7 @@ function handleInput() {
         <td>${mode}</td>
         <td>${rst_s}</td>
         <td>${rst_r}</td>
+        <td>${operatorName}</td>
         <td>${operator}</td>
         <td class="cell-stacked">${sigInfoCell}</td>
         <td class="comment-cell">${comment}</td>
