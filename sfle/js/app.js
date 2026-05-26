@@ -141,6 +141,7 @@ function handleInput() {
     var sig = "";
     var sigInfo = "";
     var gridLocator = "";
+    var operatorName = "";
     qsoList = [];
     $("#qsoTable tbody").empty();
 
@@ -201,6 +202,8 @@ function handleInput() {
                 qsotime = String(newHour).padStart(2, '0') + item;
             } else if (isGridLocator(item)) {
                 gridLocator = item.substring(1).toUpperCase();
+            } else if (isOperatorName(item)) {
+                operatorName = item.substring(1);
             } else if (isSigInfo(item)) {
                 sigInfo = item.toUpperCase();
                 // Normalize POTA refs to remove spaces around commas
@@ -271,16 +274,20 @@ function handleInput() {
                 sigInfo,
                 gridLocator,
                 comment,
-                sotaRef,    // [11]
-                potaRef,    // [12]
-                wwffRef,    // [13]
-                otherSig,   // [14]
+                sotaRef,        // [11]
+                potaRef,        // [12]
+                wwffRef,        // [13]
+                otherSig,       // [14]
+                operatorName,   // [15]
             ]);
 
-            // Build callsign cell with optional grid locator underneath
+            // Build callsign cell with optional grid locator and operator name underneath
             let callsignCell = `<div class="cell-primary"><a href="https://qrz.com/db/${callsign}" target="_blank" rel="noopener noreferrer">${callsign}</a></div>`;
             if (gridLocator) {
                 callsignCell += `<div class="cell-meta">${gridLocator}</div>`;
+            }
+            if (operatorName) {
+                callsignCell += `<div class="cell-meta">${operatorName}</div>`;
             }
 
             // Build sigInfo cell for the OTHER station's activity (not MY_* fields)
@@ -328,6 +335,7 @@ function handleInput() {
             callsign = "";
             sigInfo = "";
             gridLocator = "";
+            operatorName = "";
         }
 
         showErrors();
@@ -698,6 +706,11 @@ Internet: https://sfle.ok2cqr.com
         let comment = item[10];
         if (comment) {
             qso = qso + getAdifTag("COMMENT", comment);
+        }
+
+        let opName = item[15];
+        if (opName) {
+            qso = qso + getAdifTag("NAME", opName);
         }
 
         qso = qso + "<EOR>";
@@ -1180,6 +1193,15 @@ function isGridLocator(str) {
 
     // Fourth pair (if present): 2 digits (extended square)
     return !(locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator));
+}
+
+// Validate operator name token (@Name) — letters with optional hyphen/apostrophe
+function isOperatorName(str) {
+    if (!str || typeof str !== 'string') {
+        return false;
+    }
+
+    return /^@[A-Za-z][A-Za-z'\-]*$/.test(str);
 }
 
 function download(filename, text) {
