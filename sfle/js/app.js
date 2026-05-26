@@ -698,7 +698,12 @@ Internet: https://sfle.ok2cqr.com
 
         let gridLocator = item[9];
         if (gridLocator) {
-            qso = qso + getAdifTag("GRIDSQUARE", gridLocator);
+            if (gridLocator.length > 8) {
+                qso = qso + getAdifTag("GRIDSQUARE", gridLocator.substring(0, 8));
+                qso = qso + getAdifTag("GRIDSQUARE_EXT", gridLocator.substring(8));
+            } else {
+                qso = qso + getAdifTag("GRIDSQUARE", gridLocator);
+            }
         }
 
         let comment = item[10];
@@ -1154,7 +1159,7 @@ function isSigInfo(str) {
 }
 
 // Validate Maidenhead locator format (#IO84NJ)
-// Supports 2, 4, 6, or 8 character locators (up to 4 pairs)
+// Supports 2, 4, 6, 8, 10, or 12 character locators (up to 6 pairs)
 function isGridLocator(str) {
     if (!str || typeof str !== 'string') {
         return false;
@@ -1168,29 +1173,29 @@ function isGridLocator(str) {
     // Remove the # prefix for validation
     const locator = str.substring(1);
 
-    // Must be 2, 4, 6, or 8 characters (1-4 pairs)
-    if (locator.length < 2 || locator.length > 8 || locator.length % 2 !== 0) {
+    // Must be 2, 4, 6, 8, 10, or 12 characters (1-6 pairs)
+    if (locator.length < 2 || locator.length > 12 || locator.length % 2 !== 0) {
         return false;
     }
 
-    // Validate the pattern: pairs of letters, then numbers, then letters, then numbers
-    // First pair: 2 letters (field)
-    if (!/^[A-Ra-r]{2}/.test(locator)) {
+    // Pairs alternate letters / digits. Field pair uses A-R, all later
+    // letter pairs use A-X.
+    if (locator.length >= 2 && !/^[A-Ra-r]{2}/.test(locator)) {
         return false;
     }
-
-    // Second pair (if present): 2 digits (square)
     if (locator.length >= 4 && !/^[A-Ra-r]{2}[0-9]{2}/.test(locator)) {
         return false;
     }
-
-    // Third pair (if present): 2 letters (subsquare)
     if (locator.length >= 6 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}/.test(locator)) {
         return false;
     }
-
-    // Fourth pair (if present): 2 digits (extended square)
-    return !(locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator));
+    if (locator.length >= 8 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator)) {
+        return false;
+    }
+    if (locator.length >= 10 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}[A-Xa-x]{2}/.test(locator)) {
+        return false;
+    }
+    return !(locator.length >= 12 && !/^[A-Ra-r]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}[A-Xa-x]{2}[0-9]{2}/.test(locator));
 }
 
 // Validate operator name token (@Name) — letters with optional hyphen/apostrophe
