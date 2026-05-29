@@ -885,14 +885,8 @@ $(".js-download-csv").click(function () {
         const sigInfo = item[8] || '';
         const comment = item[10] || '';
 
-        // Combine all station activities from qsoList
-        let myActivities = [];
-        if (item[11]) myActivities.push(`SOTA:${item[11]}`); // sotaRef
-        if (item[12]) myActivities.push(`POTA:${item[12]}`); // potaRef
-        if (item[13]) myActivities.push(`WWFF:${item[13]}`); // wwffRef
-        if (item[14]) myActivities.push(item[14]); // otherSig (already in "TYPE:REF" format)
-        // Backward compatibility: if no new activities, use old sigInfo
-        const myActivitiesStr = myActivities.length > 0 ? myActivities.join(' / ') : mySigInfo;
+        // SOTA CSV: column 3 holds the activator's SOTA summit ref, or empty
+        const myActivitiesStr = item[11] || (mySig === 'SOTA' ? mySigInfo : '');
 
         // Convert band to MHz if we have a band
         const bandMhz = band ? bandToMhz(band) : freq;
