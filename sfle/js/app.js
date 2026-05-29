@@ -935,6 +935,96 @@ $(".js-download-csv").click(function () {
 });
 
 
+function buildTableRows() {
+    handleInput();
+    const myCall = $("#my-call").val().toUpperCase();
+    const operator = $("#operator").val().toUpperCase();
+    const headers = ['#', 'Date', 'Time', 'Callsign', 'Band', 'Mode', 'RSTs', 'RSTr', 'Name', 'My Call', 'Op.', 'Sig', 'Comment'];
+    const rows = qsoList.map((item, idx) => [
+        String(idx + 1).padStart(3, '0'),
+        item[0] || '',
+        item[1] || '',
+        item[2] || '',
+        item[4] || '',
+        item[5] || '',
+        item[6] || '',
+        item[7] || '',
+        item[15] || '',
+        myCall,
+        operator,
+        item[8] || '',
+        item[10] || '',
+    ]);
+    return { headers, rows };
+}
+
+$(".js-download-md").click(function () {
+    const { headers, rows } = buildTableRows();
+    const escapeMd = (v) => String(v).replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ');
+    const lines = [];
+    lines.push('| ' + headers.join(' | ') + ' |');
+    lines.push('|' + headers.map(() => '---').join('|') + '|');
+    rows.forEach(r => lines.push('| ' + r.map(escapeMd).join(' | ') + ' |'));
+
+    const operator = $("#operator").val().toUpperCase() || 'log';
+    const dateInput = $("#qsodate").val();
+    const qsodate = dateInput ? dateInput : new Date().toISOString().split('T')[0];
+    const filename = qsodate + '_' + operator.replace(/\//g, '-') + '.md';
+    download(filename, lines.join('\n') + '\n');
+});
+
+$(".js-download-txt").click(function () {
+    const { headers, rows } = buildTableRows();
+    const TAB = 8;
+    const sanitize = (v) => String(v).replace(/[\t\r\n]+/g, ' ');
+    const cleanHeaders = headers.map(sanitize);
+    const cleanRows = rows.map(r => r.map(sanitize));
+
+    // Max content width per column (header vs all data)
+    const colMax = cleanHeaders.map((h, i) => {
+        let m = h.length;
+        cleanRows.forEach(r => { if (r[i].length > m) m = r[i].length; });
+        return m;
+    });
+
+    // Target column position after each field (next tab stop strictly past content end)
+    const nextStop = (pos) => Math.floor(pos / TAB) * TAB + TAB;
+    const targets = [];
+    let acc = 0;
+    colMax.forEach(w => {
+        acc = nextStop(acc + w);
+        targets.push(acc);
+    });
+    const lineWidth = targets[targets.length - 1];
+
+    const renderRow = (cells) => {
+        let out = '';
+        let pos = 0;
+        cells.forEach((cell, i) => {
+            out += cell;
+            pos += cell.length;
+            const target = i === cells.length - 1 ? pos : targets[i];
+            while (pos < target) {
+                out += '\t';
+                pos = nextStop(pos);
+            }
+        });
+        return out;
+    };
+
+    const lines = [];
+    lines.push(renderRow(cleanHeaders));
+    lines.push('-'.repeat(lineWidth));
+    cleanRows.forEach(r => lines.push(renderRow(r)));
+
+    const operator = $("#operator").val().toUpperCase() || 'log';
+    const dateInput = $("#qsodate").val();
+    const qsodate = dateInput ? dateInput : new Date().toISOString().split('T')[0];
+    const filename = qsodate + '_' + operator.replace(/\//g, '-') + '_table.txt';
+    download(filename, lines.join('\n') + '\n');
+});
+
+
 function parseFLEFile(content) {
     // Parse FLE file format
     const lines = content.split('\n');
