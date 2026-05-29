@@ -133,6 +133,8 @@ function handleInput() {
     var operator = $("#operator").val();
     operator = operator.toUpperCase();
 
+    var myCall = $("#my-call").val().toUpperCase();
+
     var extraQsoDate = qsodate;
     var band = "";
     var mode = "";
@@ -305,6 +307,7 @@ function handleInput() {
         <td>${rst_s}</td>
         <td>${rst_r}</td>
         <td>${operatorName}</td>
+        <td>${myCall}</td>
         <td>${operator}</td>
         <td class="cell-stacked">${sigInfoCell}</td>
         <td class="comment-cell">${comment}</td>

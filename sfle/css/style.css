@@ -56,17 +56,19 @@ tbody tr {
 }
 
 /* Column widths optimized for data */
-thead th:nth-child(1), tbody td:nth-child(1) { width: 4%; } /* # */
-thead th:nth-child(2), tbody td:nth-child(2) { width: 9%; white-space: nowrap; } /* Date */
-thead th:nth-child(3), tbody td:nth-child(3) { width: 5%; } /* Time */
-thead th:nth-child(4), tbody td:nth-child(4) { width: 12%; } /* Callsign */
-thead th:nth-child(5), tbody td:nth-child(5) { width: 5%; } /* Band */
-thead th:nth-child(6), tbody td:nth-child(6) { width: 5%; } /* Mode */
-thead th:nth-child(7), tbody td:nth-child(7) { width: 5%; } /* RS */
-thead th:nth-child(8), tbody td:nth-child(8) { width: 5%; } /* RR */
-thead th:nth-child(9), tbody td:nth-child(9) { width: 8%; } /* Op. */
-thead th:nth-child(10), tbody td:nth-child(10) { width: 17%; } /* Sig Info */
-thead th:nth-child(11), tbody td:nth-child(11) { width: 25%; } /* Comment */
+thead th:nth-child(1),  tbody td:nth-child(1)  { width: 4%; }  /* # */
+thead th:nth-child(2),  tbody td:nth-child(2)  { width: 9%; white-space: nowrap; } /* Date */
+thead th:nth-child(3),  tbody td:nth-child(3)  { width: 5%; }  /* Time */
+thead th:nth-child(4),  tbody td:nth-child(4)  { width: 11%; } /* Callsign */
+thead th:nth-child(5),  tbody td:nth-child(5)  { width: 5%; }  /* Band */
+thead th:nth-child(6),  tbody td:nth-child(6)  { width: 5%; }  /* Mode */
+thead th:nth-child(7),  tbody td:nth-child(7)  { width: 5%; }  /* RSTs */
+thead th:nth-child(8),  tbody td:nth-child(8)  { width: 5%; }  /* RSTr */
+thead th:nth-child(9),  tbody td:nth-child(9)  { width: 7%; }  /* Name */
+thead th:nth-child(10), tbody td:nth-child(10) { width: 8%; }  /* My Call */
+thead th:nth-child(11), tbody td:nth-child(11) { width: 7%; }  /* Op. */
+thead th:nth-child(12), tbody td:nth-child(12) { width: 11%; } /* Sig */
+thead th:nth-child(13), tbody td:nth-child(13) { width: 18%; } /* Comment */
 
 /* Resizable columns */
 thead th {
