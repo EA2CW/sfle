@@ -62,9 +62,17 @@ tbody tr {
 }
 
 /* Column widths optimized for data */
-thead th:nth-child(1),  tbody td:nth-child(1)  { width: 4%; }  /* # */
-thead th:nth-child(2),  tbody td:nth-child(2)  { width: 9%; white-space: nowrap; } /* Date */
-thead th:nth-child(3),  tbody td:nth-child(3)  { width: 5%; }  /* Time */
+/* Row number has no spaces to wrap on, so like Date/Time it needs a
+   character-based width rather than a percentage that can end up
+   narrower than "001". */
+thead th:nth-child(1),  tbody td:nth-child(1)  { width: 4ch; white-space: nowrap; }  /* # */
+/* Date/Time are fixed-format content (YYYY-MM-DD, HHMM) that must never
+   wrap; a percentage of the table width isn't reliably wide enough for
+   that at every table size, so give them a width based on character
+   count instead - it holds regardless of overall table width and scales
+   with the table font-size control. */
+thead th:nth-child(2),  tbody td:nth-child(2)  { width: 11ch; white-space: nowrap; } /* Date */
+thead th:nth-child(3),  tbody td:nth-child(3)  { width: 5ch; white-space: nowrap; }  /* Time */
 thead th:nth-child(4),  tbody td:nth-child(4)  { width: 11%; } /* Callsign */
 thead th:nth-child(5),  tbody td:nth-child(5)  { width: 5%; }  /* Band */
 thead th:nth-child(6),  tbody td:nth-child(6)  { width: 5%; }  /* Mode */
