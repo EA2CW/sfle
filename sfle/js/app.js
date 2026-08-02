@@ -1047,32 +1047,35 @@ function parseFLEFile(content) {
             return;
         }
 
+        // Header keywords are case-insensitive in FLE files
+        const lineLower = line.toLowerCase();
+
         // Parse header fields
-        if (line.startsWith('operator ')) {
+        if (lineLower.startsWith('operator ')) {
             operator = line.substring(9).trim().toUpperCase();
-        } else if (line.startsWith('mycall ')) {
+        } else if (lineLower.startsWith('mycall ')) {
             myCall = line.substring(7).trim().toUpperCase();
-        } else if (line.startsWith('mysota ')) {
+        } else if (lineLower.startsWith('mysota ')) {
             sotaRef = line.substring(7).trim().toUpperCase();
-        } else if (line.startsWith('mypota ')) {
+        } else if (lineLower.startsWith('mypota ')) {
             potaRef = normalizePotaRefs(line.substring(7).trim());
-        } else if (line.startsWith('mywwff ')) {
+        } else if (lineLower.startsWith('mywwff ')) {
             wwffRef = line.substring(7).trim().toUpperCase();
-        } else if (line.startsWith('mysig ')) {
+        } else if (lineLower.startsWith('mysig ')) {
             otherSig = line.substring(6).trim().toUpperCase();
-        } else if (line.startsWith('mysiginfo ')) {
+        } else if (lineLower.startsWith('mysiginfo ')) {
             otherSigRef = line.substring(10).trim().toUpperCase();
-        } else if (line.startsWith('mywota ')) {
+        } else if (lineLower.startsWith('mywota ')) {
             // For backward compatibility, WOTA goes to "other" activity
             otherSig = 'WOTA';
             otherSigRef = line.substring(7).trim().toUpperCase();
-        } else if (line.startsWith('date ')) {
+        } else if (lineLower.startsWith('date ')) {
             qsoDate = line.substring(5).trim();
             inLogSection = true;
-        } else if (line.startsWith('# MY_SIG ')) {
+        } else if (lineLower.startsWith('# my_sig ')) {
             // Legacy comment format - ignore if we already have activities
             if (!otherSig) otherSig = line.substring(9).trim().toUpperCase();
-        } else if (line.startsWith('# MY_SIG_INFO ')) {
+        } else if (lineLower.startsWith('# my_sig_info ')) {
             if (!otherSigRef) otherSigRef = line.substring(14).trim().toUpperCase();
         } else if (inLogSection) {
             // This is QSO data - add it to the array (preserve # comment lines)
@@ -1295,11 +1298,11 @@ function isOperatorName(str) {
 }
 
 function download(filename, text) {
+    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+
     var element = document.createElement("a");
-    element.setAttribute(
-        "href",
-        "data:text/plain;charset=utf-8," + encodeURIComponent(text)
-    );
+    element.setAttribute("href", url);
     element.setAttribute("download", filename);
 
     element.style.display = "none";
@@ -1308,6 +1311,7 @@ function download(filename, text) {
     element.click();
 
     document.body.removeChild(element);
+    URL.revokeObjectURL(url);
 }
 
 function loadPowerSettings() {
