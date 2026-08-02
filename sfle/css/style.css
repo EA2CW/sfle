@@ -48,6 +48,12 @@ table {
   position: relative;
 }
 
+/* Keep columns wide enough to avoid content overflowing onto neighboring
+   cells; scroll horizontally instead of squeezing below this width. */
+#qsoTable {
+  min-width: 700px;
+}
+
 thead,
 tbody tr {
   width: 100%;
@@ -238,6 +244,26 @@ li.nav-item {
 #table-panel .qsoList {
   flex: 1;
   overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* Stack the form and table panels instead of forcing two 300px-min-width
+   flex items side by side, which overflows on phone-width viewports. */
+@media (max-width: 768px) {
+  .resizable-container {
+    flex-direction: column;
+  }
+
+  #form-panel,
+  #table-panel {
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .resizable-splitter {
+    display: none;
+  }
 }
 
 .resizable-splitter {
