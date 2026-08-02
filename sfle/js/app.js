@@ -463,14 +463,14 @@ CW
     $textarea.val(logData.trim());
     const myCall = $("#my-call");
     if (myCall.val() === "") {
-        myCall.val("OK2CQR/P");
+        myCall.val("EA2CW/P");
     }
     const operator = $("#operator");
     if (operator.val() === "") {
-        operator.val("OK2CQR");
+        operator.val("EA2CW");
     }
     const mySig = $("#my-sig");
-    if (mySig.val() === "") {
+    if (mySig.val() === "EA2/BI-055") {
         mySig.val("SOTA");
     }
     const mySigRef = $("#my-sig-ref");
@@ -583,10 +583,17 @@ $(".js-download-adif").click(function () {
     const myPower = $("#my-power").val();
     const myGrid = $("#my-grid").val().toUpperCase();
 
-    const adifHeader = `
+//
+	const now = new Date();
+	let currentLocalDate = now.toString();
+	let currentUTCTime = now.toUTCString();
+	const adifHeaderTime = `File generated on `+ currentUTCTime;
+//
+    const adifHeader = adifHeaderTime + `
 ADIF export from Simple fast log entry by Petr, OK2CQR
-
+Modified by M5TEA, EA2CW
 Internet: https://sfle.ok2cqr.com
+github: https://github.com/urbancamo/sfle
 
 <ADIF_VER:5>3.1.6
 <PROGRAMID:4>SFLE
