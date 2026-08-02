@@ -1297,10 +1297,29 @@ function isOperatorName(str) {
     return /^@[A-Za-z][A-Za-z'\-]*$/.test(str);
 }
 
+function isIOS() {
+    // iPadOS reports its platform as "MacIntel" like a real Mac, so also
+    // check for multi-touch support to tell it apart from a desktop.
+    return /iPad|iPhone|iPod/.test(navigator.platform) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
 function download(filename, text) {
     var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
 
+    // iOS Safari's anchor download attribute is unreliable for blob: URLs -
+    // it often saves under a random name derived from the blob URL instead
+    // of the suggested filename. The Web Share API's File objects carry
+    // their name explicitly and are honored by "Save to Files".
+    if (isIOS() && navigator.canShare) {
+        var file = new File([blob], filename, { type: blob.type });
+        if (navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file] }).catch(function () {});
+            return;
+        }
+    }
+
+    var url = URL.createObjectURL(blob);
     var element = document.createElement("a");
     element.setAttribute("href", url);
     element.setAttribute("download", filename);
