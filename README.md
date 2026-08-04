@@ -6,7 +6,7 @@
 
 Written in HTML/Javascript by [Petr, OK2CQR](https://www.ok2cqr.com).
 Modified by Mark M5TEA
-Adapted by Mikel EA2CW starting 2026-08-02
+ and tuned by Mikel EA2CW starting 2026-08-02
 Heavily inspired by [FLE](https://df3cb.com/fle/) from [Bernd, DF3CB](https://df3cb.com/).
 Unfortunately, Fast Log Entry works only on Windows and Linux using Wine, but I needed something working on macOS and/or
 Android tablets. I didn't need all the features, just wanted to log QSO from my WFF/SOTA/GMA activation.
