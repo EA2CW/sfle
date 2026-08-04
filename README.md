@@ -2,7 +2,7 @@
 
 **Simple fast log entry** - a tool to enter QSOs from your SOTA/GMA/WWFF activations and create the ADIF files - everything just in your browser.
 
-## Working application is available on **[sfle.ok2cqr.com](https://sfle.ok2cqr.com)**
+## Working application is available on **[sota.gautxori.eus](https://sota.gautxori.eus/sfle)**
 
 Written in HTML/Javascript by [Petr, OK2CQR](https://www.ok2cqr.com).
 Modified by Mark M5TEA
