@@ -304,13 +304,8 @@ function handleInput() {
         <td class="cell-stacked">${callsignCell}</td>
         <td><span data-toggle="tooltip" data-placement="left" title="${freq}">${band}</span></td>
         <td>${mode}</td>
-        <td>${rst_s}</td>
-        <td>${rst_r}</td>
-        <td>${operatorName}</td>
         <td>${myCall}</td>
-        <td>${operator}</td>
         <td class="cell-stacked">${sigInfoCell}</td>
-        <td class="comment-cell">${comment}</td>
       </tr>`);
 
             $("#qsoTable > tbody:last-child").append(tableRow);
@@ -946,7 +941,7 @@ function buildTableRows() {
     handleInput();
     const myCall = $("#my-call").val().toUpperCase();
     const operator = $("#operator").val().toUpperCase();
-    const headers = ['#', 'Date', 'Time', 'Callsign', 'Band', 'Mode', 'RSTs', 'RSTr', 'Name', 'My Call', 'Op.', 'Sig', 'Comment'];
+    const headers = ['#', 'Date', 'Time', 'Callsign', 'Band', 'Mode', 'My Call', 'Sig'];
     const rows = qsoList.map((item, idx) => [
         String(idx + 1).padStart(3, '0'),
         item[0] || '',
@@ -954,13 +949,13 @@ function buildTableRows() {
         item[2] || '',
         item[4] || '',
         item[5] || '',
-        item[6] || '',
-        item[7] || '',
+       // item[6] || '',
+       // item[7] || '',
         item[15] || '',
         myCall,
-        operator,
+       // operator,
         item[8] || '',
-        item[10] || '',
+       // item[10] || '',
     ]);
     return { headers, rows };
 }
