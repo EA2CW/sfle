@@ -73,17 +73,11 @@ thead th:nth-child(1),  tbody td:nth-child(1)  { width: 4ch; white-space: nowrap
    with the table font-size control. */
 thead th:nth-child(2),  tbody td:nth-child(2)  { width: 11ch; white-space: nowrap; } /* Date */
 thead th:nth-child(3),  tbody td:nth-child(3)  { width: 5ch; white-space: nowrap; }  /* Time */
-thead th:nth-child(4),  tbody td:nth-child(4)  { width: 11%; } /* Callsign */
-thead th:nth-child(5),  tbody td:nth-child(5)  { width: 5%; }  /* Band */
-thead th:nth-child(6),  tbody td:nth-child(6)  { width: 5%; }  /* Mode */
-thead th:nth-child(7),  tbody td:nth-child(7)  { width: 5%; }  /* RSTs */
-thead th:nth-child(8),  tbody td:nth-child(8)  { width: 5%; }  /* RSTr */
-thead th:nth-child(9),  tbody td:nth-child(9)  { width: 7%; }  /* Name */
-thead th:nth-child(10), tbody td:nth-child(10) { width: 8%; }  /* My Call */
-thead th:nth-child(11), tbody td:nth-child(11) { width: 7%; }  /* Op. */
-thead th:nth-child(12), tbody td:nth-child(12) { width: 11%; } /* Sig */
-thead th:nth-child(13), tbody td:nth-child(13) { width: 18%; } /* Comment */
-
+thead th:nth-child(4),  tbody td:nth-child(4)  { width: 15%; } /* Callsign */
+thead th:nth-child(5),  tbody td:nth-child(5)  { width: 8%; }  /* Band */
+thead th:nth-child(6),  tbody td:nth-child(6)  { width: 8%; }  /* Mode */
+thead th:nth-child(10), tbody td:nth-child(10) { width: 10%; }  /* My Call */
+thead th:nth-child(12), tbody td:nth-child(12) { width: 21%; } /* Sig */
 /* Resizable columns */
 thead th {
   position: relative;
@@ -230,6 +224,7 @@ li.nav-item {
 .resizable-panel {
   overflow: visible;
   padding: 0 15px;
+  min-height: 300px;
 }
 
 #table-panel.resizable-panel {
