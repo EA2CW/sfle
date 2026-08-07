@@ -1,6 +1,7 @@
 # SFLE - Simple Fast Log Entry
 
 **Simple Fast Log Entry** is a tool to log QSOs from your SOTA/GMA/WWFF activations and generate CSV, FLE and ADIF files -everything just in your browser.
+
 FLE and ADIF files are now accepted by SOTAdata. ADIF formatted files can also be uploaded to eQSL, LoTW and QRZ.COM
 
 ## Working application is available on **[sota.gautxori.eus/sfle](https://sota.gautxori.eus/sfle)**
