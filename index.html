@@ -224,13 +224,8 @@
 										<th>Callsign</th>
 										<th>Band</th>
 										<th>Mode</th>
-										<th>RSTs</th>
-										<th>RSTr</th>
-										<th>Name</th>
 										<th>My Call</th>
-										<th>Op.</th>
-										<th>Sig</th>
-										<th>Comment</th>
+										<th>Info</th>
 									</tr>
 								</thead>
 								<tbody id="qsoTableBody">
@@ -329,182 +324,33 @@
 				<div class="row mt-4">
 					<div class="col">
 						<p>
-							Simple fast log entry written in HTML/Javascript by <a href="https://www.ok2cqr.com">Petr,
+							Simple Fast Log Entry, written by <a href="https://www.ok2cqr.com">Petr,
 								OK2CQR</a>. 
-							Heavily inspired by <a href="https://df3cb.com/fle/">FLE</a> from <a
-								href="https://df3cb.com/">Bernd, DF3CB</a>.
-							Unfortunately, the FLE works only on Windows and Linux using Wine, but I needed something
-							working on macOS and/or Android tablet. I&nbsp;didn't need all the features, just wanted to log QSO from my
-							WFF/SOTA/GMA activation.
+							Based on <a href="https://df3cb.com/fle/">Fast Log Entry (FLE)</a> by <a href="https://df3cb.com/">Bernd, DF3CB</a>.							
 						</p>
 						<p>
-							The QSO line must have at least time and correspondant callsign.<br>
+						<h4>Syntax:</h4>
+							Each QSO line must have at least time and correspondant callsign.<br>
 							The time format can be:<br>
-							- hhmm<br>
-							- mm only (if a <b>hhmm</b> has been entered before)<br>
-							Optional information:<br>
 							<ul>
-								<li> Grid square: must be entered as: #XXnnXX</li>
-								<li> Name, as @name</li>
-								<li> Comment: as &lt;comment&gt;</li>							
-								<li> correspondant SOTA reference, as: SOTA XXn/XX-nnn (or simply XXn/XX-nnn)</li>
+							<li> <b>hhmm</b></li>
+							<li> <b>mm</b> only (if a full <b>hhmm</b> has been entered before)</li>
+							<li> <b>m</b> last minute digit only (again, only if a full time <b>hhmm</b> has already been entered)</li>
+							</ul>
+							Optional information:
+							<ul>
+								<li> Grid square: must be entered as: <b>#XXnnXX</b></li>
+								<li> Name, as <b>@name</b></li>
+								<li> Comment, as <b>&lt;comment&gt;</b></li>							
+								<li> correspondant SOTA reference, as <b>SOTA XXn/XX-nnn</b> (or simply <b>XXn/XX-nnn</b>)</li>
 							</ul>
 						For example:<br>
 						1244 EA2CKX @Pedro #IN82JJ &lt;good sigs&gt; <br>
 						45 EA2CQ/p @Iñigo SOTA EA2/VI-014<br>
 						</p>	
 						<p>
-							The SFLE (Simple fast log entry) is a tool created by GDD (Google Driven Development) using
-							Bootstrap 4 and jQuery (I'm a backend developer). Data is stored only in your browser.
-							The website does not collect any data about you.
+							Source code is available on <a href="https://github.com/ea2cw/sfle">GitHub</a>.
 						</p>
-
-						<p>
-							If you find any bug or have a suggestion on how to improve the website, please let me know
-							at <a href="mailto:petr@ok2cqr.com">petr@ok2cqr.com</a>.
-							I&nbsp;get many emails every day, if you don't get a reply in a few days, don't hesitate to
-							send your email again.
-						</p>
-						<p>
-							Source code is available on <a href="https://github.com/ok2cqr/sfle">GitHub</a>.
-						</p>
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col">
-						<strong>Changelog:</strong>
-					</div>
-				</div>
-				<div class="row">
-					<div class="row">
-						<div class="col">
-							<p>
-								<strong>2025-01-04</strong>
-							</p>
-							<ul class="mt-1">
-								<li><span class="text-primary text-monospace">new:</span> button <i>Clear logging</i> session now does not delete data from <i>My call</i> and <i>Operator</i> fields</li>
-							</ul>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<p>
-								<strong>2024-04-27</strong>
-							</p>
-							<ul class="mt-1">
-								<li><span class="text-danger text-monospace">fix:</span> three digit report on CW mode was ignored (thanks to Colin, G8TMV)</li>
-							</ul>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<p>
-								<strong>2023-12-30</strong>
-							</p>
-							<ul class="mt-1">
-								<li><span class="text-primary text-monospace">new:</span> values from fields 'My grid' and 'Power' are stored into the local storage and also visible bellow the QSO entry field</li>
-								<li><span class="text-danger text-monospace">fix:</span> small design issue </li>
-							</ul>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<p>
-								<strong>2023-09-24</strong>
-							</p>
-							<ul class="mt-1">
-								<li><span class="text-danger text-monospace">fix:</span> 70CM band was not recognized</li>
-							</ul>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<p>
-								<strong>2023-08-05</strong>
-							</p>
-							<ul class="mt-1">
-								<li><span class="text-primary text-monospace">new:</span> when you click the 'Load sample log' button, a question dialog will appear, asking if you want to replace the existing data</li>
-								<li><span class="text-primary text-monospace">new:</span> after attempting to download the ADIF file, if no band and/or mode is defined, a dialog window will appear displaying an error message</li>
-								<li><span class="text-danger text-monospace">fix:</span> getting freq from band and mode</li>
-							</ul>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<p>
-								<strong>2023-04-25</strong>
-							</p>
-							<ul class="mt-1">
-								<li><span class="text-primary text-monospace">new:</span> showing frequency after hovering the band column table</li>
-								<li><span class="text-primary text-monospace">new:</span> the website's look and feel have been significantly improved, thanks to the pull request submitted by <a href="http://kounovsky.eu">Aleš Kounovský</a>, who did an outstanding job</li>
-							</ul>
-						</div>
-					</div>
-					<div class="col">
-						<p>
-							<strong>2022-07-23</strong>
-						</p>
-						<ul class="mt-1">
-							<li><span class="text-primary text-monospace">new:</span> Power and My grid fields added to
-								Settings values will be in the exported ADIF file if filled in.</li>
-						</ul>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<p>
-							<strong>2022-02-16</strong>
-						</p>
-						<ul class="mt-1">
-							<li><span class="text-primary text-monospace">new:</span> Custom report support - e.g. 5 7
-								means 559 as RST sent and 579 as RST received on CW or 55/57 on SSB, click to <span
-									class="text-secondary">Load sample log</span> button to see real examples</li>
-						</ul>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<p>
-							<strong>2022-02-03</strong>
-						</p>
-						<ul class="mt-1">
-							<li><span class="text-primary text-monospace">new:</span> Showing QSO count below the table
-							</li>
-						</ul>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<p>
-							<strong>2022-01-29</strong>
-						</p>
-						<ul class="mt-1">
-							<li><span class="text-primary text-monospace">new:</span> dark mode (thanks to Andreas,
-								LA8AJA)</li>
-							<li><span class="text-primary text-monospace">new:</span> saving data to local storage
-								(thanks to Andreas, LA8AJA)</li>
-							<li><span class="text-primary text-monospace">new:</span> grid scrolls to last line after
-								adding a new qso (thanks to Andreas, LA8AJA)</li>
-							<li><span class="text-primary text-monospace">new:</span> website should be responsive</li>
-							<li><span class="text-danger text-monospace">fix:</span> some design fixes (thanks to
-								Andreas, LA8AJA)</li>
-							<li><span class="text-danger text-monospace">fix:</span> qso time loading</li>
-						</ul>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<p>
-							<strong>2021-12-04</strong>
-						</p>
-						<ul class="mt-1">
-							<li><span class="text-primary text-monospace">new:</span> area with QSO data has monospace
-								font</li>
-							<li><span class="text-danger text-monospace">fix:</span> callsign with slash was not
-								recognized</li>
-							<li><span class="text-danger text-monospace">fix:</span> loading qso date from date field
-							</li>
-						</ul>
 					</div>
 				</div>
 			</div>
@@ -513,10 +359,10 @@
 	<footer class="footer">
 		<div class="container text-center">
 			<span class="text-muted">
-				Simple fast log entry written in HTML/Javascript by <a href="https://www.ok2cqr.com">Petr, OK2CQR</a>.
-				Enhancements by <a href="https://qrz.com/db/M5TEA">Mark, M5TEA</a>.
-				Source code fork is available on <a href="https://github.com/urbancamo/sfle">GitHub</a>.
-				Heavily inspired by <a href="https://df3cb.com/fle/">FLE</a> from <a href="https://df3cb.com/">Bernd,
+				Simple Fast Log Entry by <a href="https://www.ok2cqr.com">Petr, OK2CQR</a>.
+				Enhancements by <a href="https://qrz.com/db/M5TEA">Mark, M5TEA</a> & <a href="https://qrz.com/db/EA2CW">Mikel, EA2CW</a>.
+				Source code fork is available on <a href="https://github.com/ea2cw/sfle">GitHub</a>.
+				Based on <a href="https://df3cb.com/fle/">FLE</a> by <a href="https://df3cb.com/">Bernd,
 					DF3CB</a>
 			</span>
 		</div>
